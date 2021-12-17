@@ -1,0 +1,21 @@
+Package: scAnalysisR
+Title: Single Cell Analysis Pipeline
+Version: 0.0.0.9000
+Authors@R: 
+    person("Kristen", "Wells", , "kristen.wells-wrasman@cuanschutz.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-7466-8164"))
+Description: Packages to aid in the analysis of single cell RNA-seq data. Many functions are wrappers around seurat and ggplot. Requires seurat objects.
+Depends: R (>= 3.5.1)
+License: MIT License
+Imports: Seurat,
+    tidyverse,
+    viridis,
+    RColorBrewer,
+    pathview,
+    gprofiler2,
+    openxlsx,
+    clustifyr,
+    biomaRt
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2.9000
