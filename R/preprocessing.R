@@ -300,7 +300,7 @@ group_cells <- function(sample_object, sample_name = NULL, save_dir = NULL,
     }
     plot_list <- plotDimRed(sample_object = sample_object,
                             save_plot = save_plot,
-                            col_by = col_by_list, return_plot = TRUE,
+                            col_by = col_by_list,
                             plot_type = paste0(key, ".umap"), ...)
   } else if (assay == "ADT"){
     if(is.null(reduction)){
@@ -332,7 +332,7 @@ group_cells <- function(sample_object, sample_name = NULL, save_dir = NULL,
     }
     plot_list <- plotDimRed(sample_object = sample_object,
                             save_plot = save_plot,
-                            col_by = col_by_list, return_plot = TRUE,
+                            col_by = col_by_list,
                             plot_type = paste0(key, ".umap"), ...)
   } else if(assay == "SCT"){
     if(is.null(reduction)){
@@ -362,7 +362,7 @@ group_cells <- function(sample_object, sample_name = NULL, save_dir = NULL,
     }
     plot_list <- plotDimRed(sample_object = sample_object,
                             save_plot = save_plot,
-                            col_by = col_by_list, return_plot = TRUE,
+                            col_by = col_by_list,
                             plot_type = paste0(key, ".umap"), ...)
   } else if(assay == "integrated"){
     if(is.null(reduction)){
@@ -390,7 +390,7 @@ group_cells <- function(sample_object, sample_name = NULL, save_dir = NULL,
     }
     plot_list <- plotDimRed(sample_object = sample_object,
                             save_plot = save_plot,
-                            col_by = col_by_list, return_plot = TRUE,
+                            col_by = col_by_list,
                             plot_type = "integrated.umap", ...)
   }
   
