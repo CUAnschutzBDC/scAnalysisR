@@ -619,7 +619,7 @@ hypergeometric_test <- function(seurat_object, gene_list, DE_table,
                         avg_log2FC > DE_lfc_cutoff)
       
       DE_genes <- unique(DE_one$gene)
-      
+
       # Find number of overlaps
       x <- length(intersect(gene_list_one$V1, DE_genes))
       
@@ -697,6 +697,7 @@ hypergeometric_test <- function(seurat_object, gene_list, DE_table,
 #' the ArchR package.
 #' @param breaks OPTIONAL How to adjust the color scale. Can use if the heatmap looks
 #' washed out. Default is FALSE.
+#' @param mak_val OPTIONAL where to cutoff the color scale. Default is no cutoff.
 #' @return A pheatmap object
 #' @import tidyverse
 #' @import RColorBrewer
@@ -719,7 +720,7 @@ plot_hypergeom <- function(hypergeom_output, colors = NULL, meta_df = NULL,
                            color_list = NULL,
                            cluster_rows = FALSE, cluster_cols = FALSE,
                            color_palette = NULL,
-                           breaks = FALSE){
+                           breaks = FALSE, max_val = NULL){
   
   hypergeom_output$log_adj_pval <- -log10(hypergeom_output$p_adj)
   
@@ -785,6 +786,11 @@ plot_hypergeom <- function(hypergeom_output, colors = NULL, meta_df = NULL,
     breaks <- NULL
   }
   
+  if(!is.null(max_val)){
+    hypergeom_output_w <- ifelse(hypergeom_output_w > max_val,
+                                 max_val, hypergeom_output_w)
+  }
+
   heatmap <- pheatmap(hypergeom_output_w, cluster_rows = cluster_rows,
                       cluster_cols = cluster_cols,
                       show_rownames = TRUE, 

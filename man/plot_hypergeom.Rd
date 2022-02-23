@@ -12,7 +12,8 @@ plot_hypergeom(
   cluster_rows = FALSE,
   cluster_cols = FALSE,
   color_palette = NULL,
-  breaks = FALSE
+  breaks = FALSE,
+  max_val = NULL
 )
 }
 \arguments{
@@ -45,6 +46,8 @@ the ArchR package.}
 
 \item{breaks}{OPTIONAL How to adjust the color scale. Can use if the heatmap looks
 washed out. Default is FALSE.}
+
+\item{mak_val}{OPTIONAL where to cutoff the color scale. Default is no cutoff.}
 }
 \value{
 A pheatmap object
