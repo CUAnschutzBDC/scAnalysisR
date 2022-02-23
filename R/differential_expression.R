@@ -19,7 +19,6 @@
 #' @return Nothing is returned, instead pathview plots are made and saved in
 #' the specified directory
 #' @import tidyverse
-#' @import pathview
 #' @export
 #' @examples
 #' \dontrun{
@@ -33,6 +32,13 @@ de_to_pathview <- function(path_id_list, seurat_object = NULL,
                            seurat_de = NULL,
                            out_dir = "pathview",
                            pval = 0.05, gen_id = "mmu", ...){
+
+  # Ask user to install pathview to use this function
+  if (!requireNamespace("pathview", quietly = TRUE)){
+    stop("Package \"monocle\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
+
   if(is.null(seurat_de) && is.null(seurat_object)){
     stop("must provide either a seurat object or a pre made de list")
   } else if(is.null(seurat_de)){
@@ -137,13 +143,18 @@ find_markers <- function(seurat_object,
 #' you aren't using mouse
 #' @keywords internal
 #' @import tidyverse
-#' @import pathview
 #' @export
 
 run_pathview <- function(gene_matrix, path_id, path_name = NULL,
                          out_dir = "pathways", multi_state = FALSE,
                          gen_id = "mmu"){
   
+  # Ask user to install pathview to use this function
+  if (!requireNamespace("pathview", quietly = TRUE)){
+    stop("Package \"monocle\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
+
   if(is.null(path_name)){
     path_name = path_id
   }
@@ -216,6 +227,13 @@ run_gost <- function(seurat_de = NULL, seurat_object = NULL,
                      sources = c("GO:BP", "KEGG", "REAC", "TF"),
                      plot_colors = c("blue", "red"),
                      intersection_cutoff = 5){
+
+  # Ask user to install pathview to use this function
+  if (!requireNamespace("gprofiler2", quietly = TRUE)){
+    stop("Package \"monocle\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
+
   if(is.null(seurat_de) && is.null(seurat_object)){
     stop("must provide either a seurat object or a pre made de list")
   } else if(is.null(seurat_de)){
