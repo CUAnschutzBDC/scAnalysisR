@@ -618,8 +618,10 @@ hypergeometric_test <- function(seurat_object, gene_list, DE_table,
                         p_val_adj < DE_p_cutoff &
                         avg_log2FC > DE_lfc_cutoff)
       
+      DE_genes <- unique(DE_one$gene)
+      
       # Find number of overlaps
-      x <- length(intersect(gene_list_one$V1, DE_one$gene))
+      x <- length(intersect(gene_list_one$V1, DE_genes))
       
       # Length of gene list that overlaps with gene in object (total possible genes 
       # to see in comparison)
@@ -632,7 +634,7 @@ hypergeometric_test <- function(seurat_object, gene_list, DE_table,
       total <- nrow(seurat_object)
       
       # Length of the DE list
-      k <- length(DE_one$gene)
+      k <- length(DE_genes)
       
       # Calculated expected number of genes
       expected_num <- (m*k)/total
