@@ -442,10 +442,18 @@ pairwise_markers <- function(seurat_object, meta_col,
   all_de <- lapply(1:ncol(combinations), function(x){
     ident1 <- combinations[1, x]
     ident2 <- combinations[2, x]
-    marker_genes <- FindMarkers(seurat_object, only.pos = TRUE,
+    marker_genes <- FindMarkers(seurat_object, only.pos = FALSE,
                                 ident.1 = ident1, ident.2 = ident2, ...)
-    marker_genes$cluster_up <- ident1
-    marker_genes$cluster_down <- ident2
+
+    # Determine what cluster was idenfied as "up" and what cluster was "down"
+    marker_genes_up <- marker_genes %>%
+      dplyr::filter(avg_log2FC > 0) %>%
+      dplyr::mutate(cluster_up = ident1, cluster_down = ident2)
+    marker_genes_down <- marker_genes %>%
+      dplyr::filter(avg_log2FC < 0) %>%
+      dplyr::mutate(cluster_up = ident2, cluster_down = ident1) %>%
+      dplyr::mutate(avg_log2FC = abs(avg_log2FC))
+    marker_genes <- rbind(marker_genes_up, marker_genes_down)
     marker_genes$gene_name <- rownames(marker_genes)
     return(marker_genes)
   })
