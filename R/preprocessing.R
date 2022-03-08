@@ -18,6 +18,9 @@
 #' @param hashtag_idents OPTIONAL the identities of the hashtags. If provided must be
 #' exactly the identity that would be in the rowname. Default is to search for the 
 #' word "Hashtag" in the identity.
+#' @param tenx_structure OPTIONAL if the file structure is from 10x multi (sample/outs/count),
+#' 10x count (sample/outs/) or neither (sample). Options are "multi" (default), "count", or
+#' "none"
 #' @return A seurat object with assays for HTO and ADT (if HTO and ADT are true). 
 #' If HTO and ADTs are included, those matricies will be normalized by CLR normalization
 #' @import Seurat
@@ -34,9 +37,18 @@
 
 create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
                                  min_features = 200, min_cells = 3,
-                                 hashtag_idents = NULL){
-  sample_path <- file.path(count_path, sample,
-                           "outs", "count", "filtered_feature_bc_matrix")
+                                 hashtag_idents = NULL, tenx_structure = "multi"){
+  if (tenx_structure == "multi"){
+    sample_path <- file.path(count_path, sample,
+                             "outs", "count", "filtered_feature_bc_matrix")
+  } else if (tenx_structure == "count"){
+    sample_path <- file.path(count_path, sample,
+                             "outs", "filtered_feature_bc_matrix")
+  } else if (tenx_structure == "none"){
+    sample_path <- file.path(count_path, sample)
+  } else {
+    stop("tenx_structure must be 'multi', 'count', or 'none'")
+  }
   sample_data <- Read10X(data.dir = sample_path)
   if (ADT | hashtag){
     sample_object <- CreateSeuratObject(counts = sample_data[["Gene Expression"]],

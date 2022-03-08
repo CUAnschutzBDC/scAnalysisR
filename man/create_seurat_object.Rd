@@ -11,7 +11,8 @@ create_seurat_object(
   hashtag = TRUE,
   min_features = 200,
   min_cells = 3,
-  hashtag_idents = NULL
+  hashtag_idents = NULL,
+  tenx_structure = "multi"
 )
 }
 \arguments{
@@ -34,6 +35,10 @@ passed to CreateseuratObject. Default is 3.}
 \item{hashtag_idents}{OPTIONAL the identities of the hashtags. If provided must be
 exactly the identity that would be in the rowname. Default is to search for the
 word "Hashtag" in the identity.}
+
+\item{tenx_structure}{OPTIONAL if the file structure is from 10x multi (sample/outs/count),
+10x count (sample/outs/) or neither (sample). Options are "multi" (default), "count", or
+"none"}
 }
 \value{
 A seurat object with assays for HTO and ADT (if HTO and ADT are true).
