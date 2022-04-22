@@ -487,12 +487,100 @@ pairwise_markers <- function(seurat_object, meta_col,
 #' Find and write markers
 #' 
 #' This function finda all markers of all clusters for a specific column
+#' in your seurat metadata by running FindAllMarkers (for the default) or
+#' by running FindMarkers in a pairwise fashion (when pairwise is TRUE).
+#' It writes these markers to both a csv file and an excel document with
+#' one sheet per group from the meta data (ex 1 sheet per cluster). This
+#' function will further run and write the output of hypergeometric tests
+#' on supplied gene lists using the identified markers. It will perform a 
+#' p-value fdr correction based on the number of lists supplied.
+#' @param seurat_object A seurat object that has already been normalized.
+#' @param save_dir The path to save all of the output file.
+#' @param meta_col OPTIONAL The column in the meta data to use to identify  
+#' markers. Default is RNA_cluster.
+#' @param assay OPTIONAL the assay to run the differential expression.
+#' Default is RNA.
+#' @param p_val OPTIONAL The cutoff for p value for returned genes.
+#' Default is 0.05
+#' @param logfc OPTIONAL The cutoff for the log fold change for returned
+#' genes. Default is 0.5.
+#' @param gene_lists OPTIONAL gene lists to compare against differentially
+#' expressed genes. Can provide many vectors of genes as a list. Provided
+#' lists will be used to run a hypergeometric test against differentially
+#' expressed genes identified from each cluster. If no gene lists are 
+#' included, no hypergeometric tests will be run.
+#' @param pairwise OPTIONAL if the differential expression should be done
+#' in a pairwise fashion for all groups vs all groups (TRUE) or in a one vs
+#' all fashion (FALSE). FindMarkers from Seurat defaults to the one vs all
+#' approach. Default is FALSE.
+#' @return A dataframe containing all markers. It will also write a csv file
+#' with the DE genes, a csv file with the hypergeometric test output (if run)
+#' and an excel file with both hypergeometric output and DE genes.
+#' @import tidyverse
+#' @import openxlsx
+#' @export
+#' @examples
+#' \dontrun{
+#' marker_df <- find_write_markers(seurat_object = seurat_object,
+#'                                 save_dir      = "DE_files",
+#'                                 meta_col      = "clusters",
+#'                                 pairwise      = TRUE)
+#'
+#' # This is better with longer gene lists, but this is just an example
+#' my_genes <- list(t_cell = c("Cd3d", "Cd4", "Cd8"),
+#'                  beta   = c("Ins1", "Ins2", "Nkx2-2"),
+#'                  alpha  = c("Gcg", "Arx"))
+#' marker_df <- find_write_markers(seurat_object = seurat_object,
+#'                                 save_dir      = "DE_files",
+#'                                 meta_col      = "clusters",
+#'                                 gene_lists    = my_genes)
+#'}
+
+find_write_markers <- function(seurat_object, save_dir,
+                               meta_col = "RNA_cluster",
+                               assay = "RNA", pval = 0.05,
+                               logfc = 0.5, gene_lists = NULL,
+                               pairwise = FALSE){
+  # Create a directory for results
+  ifelse(!dir.exists(file.path(save_dir, "files", "DE")),
+         dir.create(file.path(save_dir, "files", "DE")), FALSE)
+  
+  Idents(seurat_object) <- meta_col
+  
+  if (pairwise){
+    # Find markers for all clusters in a pairwise fashion
+    marker_genes <- find_write_markers_pairwise(seurat_object = seurat_object,
+                                                save_dir = save_dir,
+                                                meta_col = meta_col,
+                                                assay = assay,
+                                                pval = pval,
+                                                logfc = logfc,
+                                                gene_lists = gene_lists)
+  } else {
+    # Find markers using a one vs all approach
+    marker_genes <- find_write_markers_orig(seurat_object = seurat_object,
+                                            save_dir = save_dir,
+                                            meta_col = meta_col,
+                                            assay = assay,
+                                            pval = pval,
+                                            logfc = logfc,
+                                            gene_lists = gene_lists)
+  }
+  
+  return(marker_genes)
+}  
+
+
+#' Find and write markers
+#' 
+#' This function finda all markers of all clusters for a specific column
 #' in your seurat metadata by running FindAllMarkers. It writes these 
 #' markers to both a csv file and an excel document with one sheet per
 #' group from the meta data (ex 1 sheet per cluster). This function will
 #' further run and write the output of hypergeometric tests on supplied
 #' gene lists using the identified markers. It will perform a p-value fdr
-#' correction based on the number of lists supplied.
+#' correction based on the number of lists supplied. This function is meant
+#' to be called by find_write_markers and not used directly.
 #' @param seurat_object A seurat object that has already been normalized.
 #' @param save_dir The path to save all of the output file.
 #' @param meta_col OPTIONAL The column in the meta data to use to identify  
@@ -514,31 +602,12 @@ pairwise_markers <- function(seurat_object, meta_col,
 #' @import tidyverse
 #' @import openxlsx
 #' @export
-#' @examples
-#' \dontrun{
-#' marker_df <- find_write_markers(seurat_object = seurat_object,
-#'                                 save_dir      = "DE_files",
-#'                                 meta_col      = "clusters")
-#'
-#' # This is better with longer gene lists, but this is just an example
-#' my_genes <- list(t_cell = c("Cd3d", "Cd4", "Cd8"),
-#'                  beta   = c("Ins1", "Ins2", "Nkx2-2"),
-#'                  alpha  = c("Gcg", "Arx"))
-#' marker_df <- find_write_markers(seurat_object = seurat_object,
-#'                                 save_dir      = "DE_files",
-#'                                 meta_col      = "clusters",
-#'                                 gene_lists    = my_genes)
-#'}
 
-find_write_markers <- function(seurat_object, save_dir,
-                               meta_col = "RNA_cluster",
-                               assay = "RNA", pval = 0.05,
-                               logfc = 0.5, gene_lists = NULL){
-  # Create a directory for results
-  ifelse(!dir.exists(file.path(save_dir, "files", "DE")),
-         dir.create(file.path(save_dir, "files", "DE")), FALSE)
+find_write_markers_orig <- function(seurat_object, save_dir,
+                                    meta_col = "RNA_cluster",
+                                    assay = "RNA", pval = 0.05,
+                                    logfc = 0.5, gene_lists = NULL) {
   
-  Idents(seurat_object) <- meta_col
   marker_genes <- FindAllMarkers(seurat_object, assay = seurat_assay,
                                  only.pos = TRUE)
   write.csv(marker_genes, file = file.path(save_dir, "files",
@@ -586,6 +655,109 @@ find_write_markers <- function(seurat_object, save_dir,
                file = file.path(save_dir,
                              "files", "DE", paste0(assay, "_markers_",
                              meta_col, ".xlsx")),
+               overwrite = TRUE)
+  
+  return(marker_genes)
+}
+
+#' Find and write markers
+#' 
+#' This function finda all markers of all clusters for a specific column
+#' in your seurat metadata by running FindMarkers in a pairwise fashion.
+#' It writes these markers to both a csv file and an excel document with
+#' one sheet per group from the meta data (ex 1 sheet per cluster). This
+#' function will further run and write the output of hypergeometric tests
+#' on supplied gene lists using the identified markers. It will perform a 
+#' p-value fdr correction based on the number of lists supplied. This
+#' function is meant to be called by find_write_markers and not used directly.
+#' @param seurat_object A seurat object that has already been normalized.
+#' @param save_dir The path to save all of the output file.
+#' @param meta_col OPTIONAL The column in the meta data to use to identify  
+#' markers. Default is RNA_cluster.
+#' @param assay OPTIONAL the assay to run the differential expression.
+#' Default is RNA.
+#' @param p_val OPTIONAL The cutoff for p value for returned genes.
+#' Default is 0.05
+#' @param logfc OPTIONAL The cutoff for the log fold change for returned
+#' genes. Default is 0.5.
+#' @param gene_lists OPTIONAL gene lists to compare against differentially
+#' expressed genes. Can provide many vectors of genes as a list. Provided
+#' lists will be used to run a hypergeometric test against differentially
+#' expressed genes identified from each cluster. If no gene lists are 
+#' included, no hypergeometric tests will be run.
+#' @return A dataframe containing all markers. It will also write a csv file
+#' with the DE genes, a csv file with the hypergeometric test output (if run)
+#' and an excel file with both hypergeometric output and DE genes.
+#' @import tidyverse
+#' @import openxlsx
+#' @export
+
+find_write_markers_pairwise <- function(seurat_object, save_dir,
+                                        meta_col = "RNA_cluster",
+                                        assay = "RNA", pval = 0.05,
+                                        logfc = 0.5, gene_lists = NULL) {
+  
+  marker_genes <- pairwise_markers(seurat_object, assay = seurat_assay,
+                                   meta_col = meta_col)
+  write.csv(marker_genes, file = file.path(save_dir, "files",
+                                           "DE", paste0(assay,
+                                                        "_pairwise_markers_",
+                                                        meta_col, ".csv")))
+  
+  # Create excel wb
+  gene_wb <- createWorkbook()
+  
+  # Write to excel wb
+  values <- unique(c(marker_genes$cluster_down, marker_genes$cluster_up))
+  combinations <- combn(unique(c(marker_genes$cluster_down,
+                                 marker_genes$cluster_up)),
+                        m = 2)
+  full_list <- lapply(1:ncol(combinations), function(x){
+    ident1 <- combinations[1, x]
+    ident2 <- combinations[2, x]
+    sheet_name <- paste0(ident1, "_vs_", ident2)
+    new_df <- marker_genes %>%
+      dplyr::filter((cluster_up == ident1 & cluster_down == ident2) |
+                      (cluster_up == ident2 & cluster_down == ident1)) %>%
+      dplyr::filter(p_val_adj < pval & avg_log2FC > logfc)
+    addWorksheet(gene_wb, sheet_name)
+    writeData(gene_wb, sheet_name, new_df)
+  })
+  
+  # Alter so it will work with a hypergeometric test
+  marker_genes$cluster <- paste0(marker_genes$cluster_up, "_vs_",
+                                 marker_genes$cluster_down)
+  
+  # Run a hypergeomitric test
+  if(!is.null(gene_lists)){
+    hypergeometric <- hypergeometric_test(seurat_object = seurat_data,
+                                          gene_list = gene_lists,
+                                          DE_table = marker_genes,
+                                          DE_p_cutoff = 0.05,
+                                          DE_lfc_cutoff = 0.5,
+                                          correction_method = "fdr")
+    write.csv(hypergeometric, file = file.path(save_dir, "files",
+                                               "DE", paste0(assay,
+                                                            "_hypergeometric_",
+                                                            meta_col, ".csv")))
+    
+    # Write to excel wb
+    full_list <- lapply(unique(hypergeometric$cluster), function(x){
+      x <- as.character(x)
+      new_df <- hypergeometric %>%
+        dplyr::filter(cluster == x)
+      worksheet_name <-  paste0(x, "_gse")
+      addWorksheet(gene_wb, worksheet_name)
+      writeData(gene_wb, worksheet_name, new_df)
+    })
+  }
+  
+  ## Save workbook to working directory
+  saveWorkbook(gene_wb,
+               file = file.path(save_dir,
+                                "files", "DE",
+                                paste0(assay, "_pairwise_markers_",
+                                                      meta_col, ".xlsx")),
                overwrite = TRUE)
   
   return(marker_genes)
