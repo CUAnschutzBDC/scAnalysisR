@@ -9,4 +9,28 @@ If you use this package for your own analysis, please acknowledge this repositor
 Wells, K. L., Miller, C. N., Gschwind, A. R., Wei, W., Phipps, J. D., Anderson, M. S., & Steinmetz, L. M. (2020). Combined transient ablation and single cell rna sequencing reveals the development of medullary thymic epithelial cells. ELife, 9, 1–80. https://doi.org/10.7554/eLife.60188
 ```
 
+## Installation
+
+Install `clustifyr`
+
+```R
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("clustifyr")
+```
+
+Install devtools
+
+```R
+install.packages("devtools")
+```
+
+Install `scAnalysisR`
+
+```R
+library(devtools)
+install_github("CUAnschutzBDC/scAnalysisR")
+```
+
 ## Usage
