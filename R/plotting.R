@@ -155,7 +155,7 @@ plotDimRedSingle <- function(seurat_object, col_by, plot_type = "umap",
             column specified")
     }
     if (!identical(rownames(seurat_object[[]]), rownames(plot_df))) {
-      print("must reorder cells")
+      warning("must reorder cells")
       plot_df <- plot_df[match(rownames(seurat_object[[]]),
                                rownames(plot_df)), , drop = FALSE]
     }
