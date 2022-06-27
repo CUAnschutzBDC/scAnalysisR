@@ -819,14 +819,14 @@ hypergeometric_test <- function(seurat_object, gene_list, DE_table,
       DE_genes <- unique(DE_one$gene)
 
       # Find number of overlaps
-      x <- length(intersect(gene_list_one$V1, DE_genes))
+      x <- length(intersect(gene_list_one, DE_genes))
       
       # Length of gene list that overlaps with gene in object (total possible genes 
       # to see in comparison)
-      m <- length(intersect(gene_list_one$V1, rownames(seurat_object)))
+      m <- length(intersect(gene_list_one, rownames(seurat_object)))
       
       # All genes from object not in list
-      n <- length(setdiff(rownames(seurat_object), gene_list_one$V1))
+      n <- length(setdiff(rownames(seurat_object), gene_list_one))
       
       # Total number of genes
       total <- nrow(seurat_object)
