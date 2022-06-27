@@ -57,11 +57,15 @@ create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
     if (hashtag){
       protein_data <- sample_data[["Antibody Capture"]]
       if (is.null(hashtag_idents)){
-        hashtag_data <- protein_data[grepl("Hashtag", rownames(protein_data)), ]
-        ADT_data <- protein_data[!grepl("Hashtag", rownames(protein_data)), ]
+        hashtag_data <- protein_data[grepl("Hashtag", rownames(protein_data)), ,
+                                     drop = FALSE]
+        ADT_data <- protein_data[!grepl("Hashtag", rownames(protein_data)), ,
+                                 drop = FALSE]
       } else {
-        hashtag_data <- protein_data[rownames(protein_data) %in% hashtag_idents, ]
-        ADT_data <- protein_data[!(rownames(protein_data) %in% hashtag_idents), ]
+        hashtag_data <- protein_data[rownames(protein_data) %in% hashtag_idents, ,
+                                     drop = FALSE]
+        ADT_data <- protein_data[!(rownames(protein_data) %in% hashtag_idents), ,
+                                 drop = FALSE]
       }
       sample_object[["HTO"]] <- CreateAssayObject(
         counts = hashtag_data[ ,Cells(sample_object)], min.cells = 3)
