@@ -842,6 +842,7 @@ plotDF <- function(seurat_object, y_val, x_val,
 #' @param average_expression OPTIONAL if the average expression of clusters should be 
 #' computed before making the heatmap. This option makes much prettier plots, but
 #' can be a bit buggy, I'm still working on making it work more robustly.
+#' @param ... Other options passed to `pheatmap`
 #' @return A pheatmap object with x axis colors based on the meta data column provided
 #' or your own meta_df with color_list.
 #' @import tidyverse
@@ -867,7 +868,7 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
                          colors = NULL, meta_df = NULL, color_list = NULL,
                          max_val = 2.5, min_val = -2.5, cluster_rows = FALSE,
                          cluster_cols = FALSE, average_expression = FALSE,
-                         plot_meta_col = TRUE){
+                         plot_meta_col = TRUE, ...){
   if(average_expression){
     # Find average expression of genes in clusters
     Idents(seurat_object) <- meta_col
@@ -959,7 +960,7 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
                       show_colnames = FALSE, annotation_col = sample_info,
                       annotation_colors = coloring, color = blueYellow,
                       border_color = NA, clustering_method = "complete",
-                      silent = TRUE)
+                      silent = TRUE, ...)
   return(heatmap)
 }
 
