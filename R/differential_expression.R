@@ -35,7 +35,7 @@ de_to_pathview <- function(path_id_list, seurat_object = NULL,
 
   # Ask user to install pathview to use this function
   if (!requireNamespace("pathview", quietly = TRUE)){
-    stop("Package \"monocle\" needed for this function to work. Please install it.",
+    stop("Package \"pathview\" needed for this function to work. Please install it.",
       call. = FALSE)
   }
 

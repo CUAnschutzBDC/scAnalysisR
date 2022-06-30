@@ -32,7 +32,6 @@
 #' @return a list containing the correlation matricies and the seurat object with a new
 #' meta data column including the identified cell type.
 #' @import tidyverse
-#' @import clustifyr
 #' @export
 #' @examples
 #' \dontrun{
@@ -50,6 +49,13 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
                           plot_type = "rna.umap",
                           cor_cutoff = 0.5){
   
+  # Ask user to install clustifyr to use this function
+  if (!requireNamespace("clustifyr", quietly = TRUE)){
+    stop("Package \"clustifyr\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
+
+
   # Make directories if they don't exist
   ifelse(!dir.exists(file.path(save_dir, "images")),
          dir.create(file.path(save_dir, "images")), FALSE)
