@@ -13,7 +13,8 @@ Imports: Seurat,
     RColorBrewer,
     openxlsx,
     biomaRt,
-    Matrix
+    Matrix,
+    pheatmap
 Suggests:
     clustifyr,
     pathview
