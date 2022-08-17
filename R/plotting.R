@@ -870,7 +870,7 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
                          colors = NULL, meta_df = NULL, color_list = NULL,
                          max_val = 2.5, min_val = -2.5, cluster_rows = FALSE,
                          cluster_cols = FALSE, average_expression = FALSE,
-                         plot_meta_col = TRUE, show_rownames = TRUE, ...){
+                         plot_meta_col = TRUE, plot_rownames = TRUE, ...){
   if(average_expression){
     # Find average expression of genes in clusters
     Idents(seurat_object) <- meta_col
@@ -958,7 +958,7 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
   
   heatmap <- pheatmap(heatmap_scale, cluster_rows = cluster_rows,
                       cluster_cols = cluster_cols,
-                      show_rownames = show_rownames,
+                      show_rownames = plot_rownames,
                       show_colnames = FALSE, annotation_col = sample_info,
                       annotation_colors = coloring, color = blueYellow,
                       border_color = NA, clustering_method = "complete",
