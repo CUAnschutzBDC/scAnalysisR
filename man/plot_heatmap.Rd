@@ -17,6 +17,7 @@ plot_heatmap(
   cluster_cols = FALSE,
   average_expression = FALSE,
   plot_meta_col = TRUE,
+  show_rownames = TRUE,
   ...
 )
 }
@@ -56,6 +57,9 @@ variable genes don't completely controll the color scale. Default is -2.5}
 \item{average_expression}{OPTIONAL if the average expression of clusters should be
 computed before making the heatmap. This option makes much prettier plots, but
 can be a bit buggy, I'm still working on making it work more robustly.}
+
+\item{show_rownames}{OPTIONAL if rownames should be printed. Default is TRUE. I generally
+like to print the rownames unless there are too many to be visually pleasng.}
 
 \item{...}{Other options passed to \code{pheatmap}}
 
