@@ -74,7 +74,6 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
   # get count matrix
   DefaultAssay(seurat_object) <- assay
   seurat_mat <- GetAssayData(object = seurat_object, slot = "data")
-  seurat_mat <- as.data.frame(seurat_mat)
   
   # Find only 1000 variable features
   
