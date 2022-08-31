@@ -72,7 +72,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
   # Set up #
   ##########
   # get count matrix
-  DefaultAssay(seurat_object) <- seurat_assay
+  DefaultAssay(seurat_object) <- assay
   seurat_mat <- GetAssayData(object = seurat_object, slot = "data")
   seurat_mat <- as.data.frame(seurat_mat)
   
