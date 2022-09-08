@@ -10,6 +10,7 @@ run_gost(
   sources = c("GO:BP", "KEGG", "REAC", "TF"),
   plot_colors = c("blue", "red"),
   intersection_cutoff = 5,
+  pval = 0.05,
   ...
 )
 }
@@ -27,6 +28,8 @@ returned by gost. Default is GO:BP, KEGG, REAC and TF}
 
 \item{intersection_cutoff}{OPTIONAL how many intersecting genes there must
 be to plot. Default is 5.}
+
+\item{pval}{OPTIONAL the pvalue to use as a cutoff, default is 0.05}
 }
 \value{
 A list containing two items, gost_output and go_plots

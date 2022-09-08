@@ -214,6 +214,7 @@ run_pathview <- function(gene_matrix, path_id, path_name = NULL,
 #' @param plot_colors OPTIONAL colors for the samples. Default is blue to red.
 #' @param intersection_cutoff OPTIONAL how many intersecting genes there must
 #' be to plot. Default is 5.
+#' @param pval OPTIONAL the pvalue to use as a cutoff, default is 0.05
 #' @return A list containing two items, gost_output and go_plots
 #' @import tidyverse
 #' @export
@@ -226,7 +227,7 @@ run_pathview <- function(gene_matrix, path_id, path_name = NULL,
 run_gost <- function(seurat_de = NULL, seurat_object = NULL,
                      sources = c("GO:BP", "KEGG", "REAC", "TF"),
                      plot_colors = c("blue", "red"),
-                     intersection_cutoff = 5, ...){
+                     intersection_cutoff = 5, pval = 0.05, ...){
 
   # Ask user to install pathview to use this function
   if (!requireNamespace("gprofiler2", quietly = TRUE)){
