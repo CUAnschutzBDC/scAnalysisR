@@ -9,7 +9,8 @@ run_gost(
   seurat_object = NULL,
   sources = c("GO:BP", "KEGG", "REAC", "TF"),
   plot_colors = c("blue", "red"),
-  intersection_cutoff = 5
+  intersection_cutoff = 5,
+  ...
 )
 }
 \arguments{

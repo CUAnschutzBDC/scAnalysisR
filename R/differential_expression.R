@@ -226,11 +226,11 @@ run_pathview <- function(gene_matrix, path_id, path_name = NULL,
 run_gost <- function(seurat_de = NULL, seurat_object = NULL,
                      sources = c("GO:BP", "KEGG", "REAC", "TF"),
                      plot_colors = c("blue", "red"),
-                     intersection_cutoff = 5){
+                     intersection_cutoff = 5, ...){
 
   # Ask user to install pathview to use this function
   if (!requireNamespace("gprofiler2", quietly = TRUE)){
-    stop("Package \"monocle\" needed for this function to work. Please install it.",
+    stop("Package \"gprofiler2\" needed for this function to work. Please install it.",
       call. = FALSE)
   }
 
@@ -241,7 +241,7 @@ run_gost <- function(seurat_de = NULL, seurat_object = NULL,
   } else {
     marker_genes_rna <- seurat_de
   }
-  marker_genes_gost <- marker_genes %>%
+  marker_genes_gost <- marker_genes_rna %>%
     dplyr::filter(p_val_adj < pval)
   
   gene_list <- lapply(unique(marker_genes_gost$cluster), function(x){
