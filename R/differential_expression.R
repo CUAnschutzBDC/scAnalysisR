@@ -414,19 +414,19 @@ save_gost <- function(gost_output, save_dir_plots, save_dir_text = NULL,
     invisible(lapply(unique(gost_text$query), function(gost_query){
       
       # Create excel wb
-      gene_wb <- createWorkbook()
+      gene_wb <- openxlsx::createWorkbook()
       
       # Write to excel wb
       full_list <- lapply(unique(gost_text$source), function(gost_source){
         new_df <- gost_text %>%
           dplyr::filter(source == gost_source & query == gost_query)
         gost_source_write <- sub(":", "_", gost_source)
-        addWorksheet(gene_wb, gost_source_write)
-        writeData(gene_wb, gost_source_write, new_df)
+        openxlsx::addWorksheet(gene_wb, gost_source_write)
+        openxlsx::writeData(gene_wb, gost_source_write, new_df)
       })
       
       ## Save workbook to working directory
-      saveWorkbook(gene_wb,
+      openxlsx::saveWorkbook(gene_wb,
                    file = file.path(save_dir_text, paste0(gost_query,
                                  "GSE_results.xlsx")),
                    overwrite = TRUE)
