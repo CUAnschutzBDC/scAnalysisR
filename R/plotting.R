@@ -1029,7 +1029,8 @@ stacked_barplots <- function(seurat_object, meta_col, color = NULL,
       dplyr::mutate(split_by = "group1") 
   }
   meta_data <- meta_data %>%
-    dplyr::mutate(percents = Freq/sum(Freq))
+    dplyr::group_by(split_by) %>%
+    dplyr::mutate(percents = Freq/sum(Freq) * 100)
   # Add colors if not provided
   if(is.null(color)){
     color <- brewer.pal(length(unique(meta_data$meta_col)), "Set1")
