@@ -870,7 +870,8 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
                          colors = NULL, meta_df = NULL, color_list = NULL,
                          max_val = 2.5, min_val = -2.5, cluster_rows = FALSE,
                          cluster_cols = FALSE, average_expression = FALSE,
-                         plot_meta_col = TRUE, plot_rownames = TRUE, ...){
+                         plot_meta_col = TRUE, plot_rownames = TRUE,
+                         cell_order = NULL, ...){
   if(average_expression){
     # Find average expression of genes in clusters
     Idents(seurat_object) <- meta_col
@@ -939,12 +940,19 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
   blueYellow <- c("#352A86", "#343DAE", "#0262E0", "#1389D2", "#2DB7A3",
                   "#A5BE6A", "#F8BA43", "#F6DA23", "#F8FA0D")
   
-  if(!cluster_cols){
-    sample_info <- sample_info[order(match(sample_info[[meta_col]],
+  if(!is.null(cell_order)){
+    sample_info <- sample_info[order(match(rownames(sample_info),
+                                           cell_order)), , drop = FALSE]
+    rownames(sample_info) <- sub("-", ".", rownames(sample_info))
+    if (!identical(colnames(heatmap_scale), rownames(sample_info))) {
+      heatmap_scale <- heatmap_scale[, rownames(sample_info)]
+    }
+  } else if (!cluster_cols) {
+    sample_info <- sample_info[order(match(sample_info[[meta_col]], 
                                            cluster_order)), , drop = FALSE]
     rownames(sample_info) <- sub("-", ".", rownames(sample_info))
-    if(!identical(colnames(heatmap_scale), rownames(sample_info))){
-      heatmap_scale <- heatmap_scale[ , rownames(sample_info)]
+    if (!identical(colnames(heatmap_scale), rownames(sample_info))) {
+      heatmap_scale <- heatmap_scale[, rownames(sample_info)]
     }
   }
   
@@ -956,13 +964,13 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
   heatmap_scale <- ifelse(heatmap_scale > max_val, max_val, heatmap_scale)
   heatmap_scale <- ifelse(heatmap_scale < min_val, min_val, heatmap_scale)
   
-  heatmap <- pheatmap(heatmap_scale, cluster_rows = cluster_rows,
-                      cluster_cols = cluster_cols,
-                      show_rownames = plot_rownames,
-                      show_colnames = FALSE, annotation_col = sample_info,
-                      annotation_colors = coloring, color = blueYellow,
-                      border_color = NA, clustering_method = "complete",
-                      silent = TRUE, ...)
+  heatmap <- pheatmap::pheatmap(heatmap_scale, cluster_rows = cluster_rows,
+                                cluster_cols = cluster_cols,
+                                show_rownames = plot_rownames,
+                                show_colnames = FALSE, annotation_col = sample_info,
+                                annotation_colors = coloring, color = blueYellow,
+                                border_color = NA, clustering_method = "complete",
+                                silent = TRUE, ...)
   return(heatmap)
 }
 

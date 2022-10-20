@@ -18,6 +18,7 @@ plot_heatmap(
   average_expression = FALSE,
   plot_meta_col = TRUE,
   plot_rownames = TRUE,
+  cell_order = NULL,
   ...
 )
 }
