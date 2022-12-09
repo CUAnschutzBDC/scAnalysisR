@@ -515,9 +515,6 @@ groupContinuousPlots <- function(group, plot_df, col_by, color = NULL,
 #' @param save_plot OPTIONAL A path to a file name if you want the plot saved. It
 #' will be saved as a PDF. If nothing is provided, the plot will be returned but not
 #' saved
-#' @param meta_data_col The column in the seurat metadata (options can be found by calling
-#' colnames(object[[]])) used for coloring the desired group. For example, if you want to
-#' only highlight one cluster, meta_data_col = "cluster".
 #' @param color The color palette used to color either the points for a jitter plot or
 #' the violins. Default is Set1 from RColorBrewer
 #' @param plot_median OPTIONAL if the median value should be included in the
@@ -526,6 +523,7 @@ groupContinuousPlots <- function(group, plot_df, col_by, color = NULL,
 #' returned as a list. Default (TRUE) returns a figure.
 #' @param dodge OPTIONAL how to adjust the placement of the violin plot. Default is 1
 #' @param width OPTIONAL how to adjust how wide the violin plots are. Default is 0.9
+#' @param ... arguments passed to other functions
 #' @return Either a list of plots (if combine = FALSE) or a gridExtra object with all
 #' plots stacked (if combine = TRUE)
 #' @import tidyverse
@@ -558,7 +556,7 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
                          color = NULL, sep_by = "cluster",
                          save_plot = NULL, col_by = NULL,
                          plot_median = TRUE, combine = TRUE,
-                         dodge = 1, width = 0.9, assay = NULL){
+                         dodge = 1, width = 0.9, assay = NULL, ...){
   geneset <- setNames(geneset, geneset)
   if (plot_type == "jitter") {
     # Make jitter plots colored by cell cycle stage
@@ -566,7 +564,7 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
       gene_list_cycle <- lapply(geneset, function(x) jitterPlot(
         seurat_object = seurat_object, y_val = x, x_val = sep_by,
         col_by = "cycle_phase", color = c("black", "red", "purple"),
-        assay = assay))
+        assay = assay, ...))
       
       # Arrange all plots into one figure
       plot_list <- gridExtra::arrangeGrob(grobs = gene_list_cycle,
@@ -577,7 +575,7 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
       
       gene_list_stage <- lapply(geneset, function(x) jitterPlot(
         seurat_object = seurat_object, y_val = x, x_val = sep_by,
-        color = color, col_by = col_by, assay = assay))
+        color = color, col_by = col_by, assay = assay, ...))
       
       # Make a plot consisting of all plots made above
       plot_list <- gridExtra::arrangeGrob(grobs = gene_list_stage,
@@ -595,7 +593,7 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
       seurat_object = seurat_object, y_val = x, x_val = sep_by,
       color = color, plot_jitter = plot_jitter, col_by = col_by,
       plot_median = plot_median, dodge = dodge, width = width,
-      assay = assay))
+      assay = assay, ...))
     
     plot_list <- gridExtra::arrangeGrob(grobs = gene_list_stage,
                                         nrow = length(geneset))
@@ -619,7 +617,8 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
 #' @param y_val What to use to create the y-axis
 #' @param x_val What to use to separate along the x-axis
 #' @param col_by OPTIONAL what to use to color the cells (or violins).
-#' @param color The color palette used to color. Default is Set1 from RColorBrewer
+#' @param color OPTIONAL The color palette used to color. Default is Set1 from RColorBrewer
+#' @param size OPTIONAL The size for the points. Default is 1
 #' @keywords internal
 #' @import tidyverse
 #' @import RColorBrewer
@@ -627,7 +626,7 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
 
 jitterPlot <- function(seurat_object, y_val, x_val,
                        col_by = NULL, color = NULL,
-                       assay = NULL) {
+                       assay = NULL, size = 1) {
   plot_data <- plotDF(seurat_object, y_val, x_val,
                       col_by, assay = assay)
   # Determine the number of different colors needed.
@@ -639,7 +638,7 @@ jitterPlot <- function(seurat_object, y_val, x_val,
                                                                color = ~col_by)) +
     #ggplot2::theme_classic() + 
     ggplot2::ylab(y_val) + ggplot2::xlab(x_val) +
-    ggplot2::geom_point() + ggplot2::geom_jitter(shape = 16) 
+    ggplot2::geom_point() + ggplot2::geom_jitter(shape = 16, size = size) 
   if(is.null(col_by)){
     plot_base <- plot_base + 
       ggplot2::theme(axis.title.x=ggplot2::element_blank(),
@@ -678,6 +677,7 @@ jitterPlot <- function(seurat_object, y_val, x_val,
 #' violin plot. Default is TRUE
 #' @param dodge OPTIONAL how to adjust the placement of the violin plot. Default is 1
 #' @param width OPTIONAL how to adjust how wide the violin plots are. Default is 0.9
+#' @param size OPTIONAL the size of the points for the jitter plot. Default is 1.
 #' @keywords internal
 #' @import tidyverse
 #' @import RColorBrewer
@@ -688,7 +688,7 @@ violinPlot <- function(seurat_object, y_val, x_val,
                        plot_jitter = FALSE,
                        plot_median = TRUE,
                        dodge = 1, width = 0.9,
-                       assay = NULL) {
+                       assay = NULL, size = 1) {
   plot_data <- plotDF(seurat_object, y_val, x_val,
                       col_by, assay = assay)
   # Determine the number of different colors needed.
@@ -712,7 +712,7 @@ violinPlot <- function(seurat_object, y_val, x_val,
       ggplot2::theme(axis.text.x = element_text(angle = 45, hjust = 1))
   }
   if (plot_jitter) {
-    plot_base <- plot_base + ggplot2::geom_jitter(shape = 16)
+    plot_base <- plot_base + ggplot2::geom_jitter(shape = 16, size = size)
   }
   
   if (is.null(color)) {

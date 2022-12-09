@@ -14,7 +14,8 @@ violinPlot(
   plot_median = TRUE,
   dodge = 1,
   width = 0.9,
-  assay = NULL
+  assay = NULL,
+  size = 1
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ violin plot. Default is TRUE}
 \item{dodge}{OPTIONAL how to adjust the placement of the violin plot. Default is 1}
 
 \item{width}{OPTIONAL how to adjust how wide the violin plots are. Default is 0.9}
+
+\item{size}{OPTIONAL the size of the points for the jitter plot. Default is 1.}
 }
 \description{
 This function is meant to be called by featDistPlot and not used on it's own!!!

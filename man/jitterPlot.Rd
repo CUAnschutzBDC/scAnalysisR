@@ -10,7 +10,8 @@ jitterPlot(
   x_val,
   col_by = NULL,
   color = NULL,
-  assay = NULL
+  assay = NULL,
+  size = 1
 )
 }
 \arguments{
@@ -22,7 +23,9 @@ jitterPlot(
 
 \item{col_by}{OPTIONAL what to use to color the cells (or violins).}
 
-\item{color}{The color palette used to color. Default is Set1 from RColorBrewer}
+\item{color}{OPTIONAL The color palette used to color. Default is Set1 from RColorBrewer}
+
+\item{size}{OPTIONAL The size for the points. Default is 1}
 }
 \description{
 This function is meant to be called by featDistPlot and not used on it's own!!!

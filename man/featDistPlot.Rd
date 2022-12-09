@@ -17,7 +17,8 @@ featDistPlot(
   combine = TRUE,
   dodge = 1,
   width = 0.9,
-  assay = NULL
+  assay = NULL,
+  ...
 )
 }
 \arguments{
@@ -58,9 +59,7 @@ returned as a list. Default (TRUE) returns a figure.}
 
 \item{width}{OPTIONAL how to adjust how wide the violin plots are. Default is 0.9}
 
-\item{meta_data_col}{The column in the seurat metadata (options can be found by calling
-colnames(object[[]])) used for coloring the desired group. For example, if you want to
-only highlight one cluster, meta_data_col = "cluster".}
+\item{...}{arguments passed to other functions}
 }
 \value{
 Either a list of plots (if combine = FALSE) or a gridExtra object with all
