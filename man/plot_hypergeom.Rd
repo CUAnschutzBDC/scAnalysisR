@@ -13,7 +13,10 @@ plot_hypergeom(
   cluster_cols = FALSE,
   color_palette = NULL,
   breaks = FALSE,
-  max_val = NULL
+  max_val = NULL,
+  row_order = NULL,
+  plot_clusters = TRUE,
+  ...
 )
 }
 \arguments{
@@ -46,6 +49,16 @@ the ArchR package.}
 
 \item{breaks}{OPTIONAL How to adjust the color scale. Can use if the heatmap looks
 washed out. Default is FALSE.}
+
+\item{row_order}{OPTIONAL if you want the rows in a certain order, this vector
+must match the names in "gene_list" from the hypergeometric output. This overrides
+any row clustering. Default is to not order the rows}
+
+\item{plot_clusters}{OPTIONAL if cluster from the sample data should be plotted.
+The default is to plot these. This is mostly helpful if you are plotting based
+on a mix of columns from the metadata, but want to color each column separately.}
+
+\item{...}{other arguements passed to pheatmap}
 
 \item{mak_val}{OPTIONAL where to cutoff the color scale. Default is no cutoff.}
 }

@@ -897,6 +897,13 @@ hypergeometric_test <- function(seurat_object, gene_list, DE_table,
 #' @param breaks OPTIONAL How to adjust the color scale. Can use if the heatmap looks
 #' washed out. Default is FALSE.
 #' @param mak_val OPTIONAL where to cutoff the color scale. Default is no cutoff.
+#' @param row_order OPTIONAL if you want the rows in a certain order, this vector
+#' must match the names in "gene_list" from the hypergeometric output. This overrides
+#' any row clustering. Default is to not order the rows
+#' @param plot_clusters OPTIONAL if cluster from the sample data should be plotted.
+#' The default is to plot these. This is mostly helpful if you are plotting based
+#' on a mix of columns from the metadata, but want to color each column separately.
+#' @param ... other arguements passed to pheatmap
 #' @return A pheatmap object
 #' @import tidyverse
 #' @import RColorBrewer
@@ -919,7 +926,8 @@ plot_hypergeom <- function(hypergeom_output, colors = NULL, meta_df = NULL,
                            color_list = NULL,
                            cluster_rows = FALSE, cluster_cols = FALSE,
                            color_palette = NULL,
-                           breaks = FALSE, max_val = NULL){
+                           breaks = FALSE, max_val = NULL,
+                           row_order = NULL, plot_clusters = TRUE, ...){
   
   hypergeom_output$log_adj_pval <- -log10(hypergeom_output$p_adj)
   
@@ -974,6 +982,12 @@ plot_hypergeom <- function(hypergeom_output, colors = NULL, meta_df = NULL,
     }
   }
   
+  if(!is.null(row_order) & !cluster_rows){
+    hypergeom_output_w <- hypergeom_output_w[row_order, ]
+  } else if(!is.null(row_order) & cluster_rows){
+    warning("Overriding provided order to cluster, if you want to keep the provided order, set cluster_rows to FALSE!")
+  }
+
   if((breaks)){
     quantile_breaks <- function(xs, n = 30) {
       breaks <- quantile(xs, probs = seq(0, 1, length.out = n))
@@ -990,13 +1004,21 @@ plot_hypergeom <- function(hypergeom_output, colors = NULL, meta_df = NULL,
                                  max_val, hypergeom_output_w)
   }
 
-  heatmap <- pheatmap(hypergeom_output_w, cluster_rows = cluster_rows,
-                      cluster_cols = cluster_cols,
-                      show_rownames = TRUE, 
-                      show_colnames = TRUE, annotation_col = sample_info,
-                      annotation_colors = coloring, color = color_palette,
-                      border_color = NA, clustering_method = "complete",
-                      silent = TRUE, breaks = breaks)
+  if(!plot_clusters){
+    sample_info$cluster <- NULL
+  }
+
+  heatmap <- pheatmap::pheatmap(hypergeom_output_w,
+                                cluster_rows = cluster_rows,
+                                cluster_cols = cluster_cols,
+                                show_rownames = TRUE, 
+                                show_colnames = TRUE, 
+                                annotation_col = sample_info,
+                                annotation_colors = coloring, 
+                                color = color_palette,
+                                border_color = NA, 
+                                clustering_method = "complete",
+                                silent = TRUE, breaks = breaks, ...)
   return(heatmap)
 }
 
