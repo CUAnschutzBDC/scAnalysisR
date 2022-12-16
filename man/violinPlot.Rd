@@ -15,7 +15,10 @@ violinPlot(
   dodge = 1,
   width = 0.9,
   assay = NULL,
-  size = 1
+  size = 1,
+  ggrastr = FALSE,
+  raster_scale = 1,
+  raster_res = 300
 )
 }
 \arguments{
@@ -39,6 +42,16 @@ violin plot. Default is TRUE}
 \item{width}{OPTIONAL how to adjust how wide the violin plots are. Default is 0.9}
 
 \item{size}{OPTIONAL the size of the points for the jitter plot. Default is 1.}
+
+\item{ggrastr}{OPTINAL If the plot should be rastarized. This is mostly helpful
+for large datasets. All of the points will be a png while the rest will still
+be editable. Default is FALSE (don't rasterize the plot)}
+
+\item{raster_scale}{OPTIONAL The scale to use. Can be helpful if the rasterized
+plot looks fuzzy. Default is 1}
+
+\item{raster_res}{OPTIONAL. Can be helpful to change if the rasterized plot
+looks fuzzy. Default is 300.}
 }
 \description{
 This function is meant to be called by featDistPlot and not used on it's own!!!

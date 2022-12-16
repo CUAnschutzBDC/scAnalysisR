@@ -226,6 +226,10 @@ discretePlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
   
   # Add colors based on metric chosen
   if (ggrastr){
+    if (!requireNamespace("ggrastr", quietly = TRUE)){
+        stop("Package \"ggrastr\" needed to make rasterized images. Please install it.",
+             call. = FALSE)
+    }
     base_plot <- base_plot +
       ggrastr::geom_point_rast(ggplot2::aes_(colour = ~colour_metric),
                                show.legend = show_legend, size = size,
@@ -287,6 +291,10 @@ continuousPlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
     ggplot2::ylab(axis_names[2])
   
   if (ggrastr){
+    if (!requireNamespace("ggrastr", quietly = TRUE)){
+        stop("Package \"ggrastr\" needed to make rasterized images. Please install it.",
+             call. = FALSE)
+    }
     base_plot <- base_plot +
       ggrastr::geom_point_rast(ggplot2::aes_(colour = ~colour_metric),
                                show.legend = show_legend, size = size,
@@ -350,6 +358,11 @@ groupDiscretePlots <- function(group, plot_df, col_by, axis_names = c("dim1", "d
     ggplot2::ylab(axis_names[2])
   
   if(ggrastr){
+    if (!requireNamespace("ggrastr", quietly = TRUE)){
+        stop("Package \"ggrastr\" needed to make rasterized images. Please install it.",
+             call. = FALSE)
+    }
+    
     base_plot <- base_plot + ggrastr::geom_point_rast(data = plot1, 
                                                       ggplot2::aes_(~dim1, ~dim2), 
                                                       color = "#DCDCDC",
@@ -439,6 +452,11 @@ groupContinuousPlots <- function(group, plot_df, col_by, color = NULL,
     ggplot2::ylab(axis_names[2])
   
   if(ggrastr){
+    if (!requireNamespace("ggrastr", quietly = TRUE)){
+        stop("Package \"ggrastr\" needed to make rasterized images. Please install it.",
+             call. = FALSE)
+    }
+    
     base_plot <- base_plot + ggrastr::geom_point_rast(data = plot1, 
                                                       ggplot2::aes_(~dim1, ~dim2), 
                                                       color = "#DCDCDC",
@@ -619,6 +637,13 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
 #' @param col_by OPTIONAL what to use to color the cells (or violins).
 #' @param color OPTIONAL The color palette used to color. Default is Set1 from RColorBrewer
 #' @param size OPTIONAL The size for the points. Default is 1
+#' @param ggrastr OPTINAL If the plot should be rastarized. This is mostly helpful
+#' for large datasets. All of the points will be a png while the rest will still
+#' be editable. Default is FALSE (don't rasterize the plot)
+#' @param raster_scale OPTIONAL The scale to use. Can be helpful if the rasterized
+#' plot looks fuzzy. Default is 1
+#' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
+#' looks fuzzy. Default is 300.
 #' @keywords internal
 #' @import tidyverse
 #' @import RColorBrewer
@@ -626,7 +651,10 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
 
 jitterPlot <- function(seurat_object, y_val, x_val,
                        col_by = NULL, color = NULL,
-                       assay = NULL, size = 1) {
+                       assay = NULL, size = 1,
+                       ggrastr = FALSE,
+                       raster_scale = 1, 
+                       raster_res = 300) {
   plot_data <- plotDF(seurat_object, y_val, x_val,
                       col_by, assay = assay)
   # Determine the number of different colors needed.
@@ -637,8 +665,24 @@ jitterPlot <- function(seurat_object, y_val, x_val,
                                                                ~y_value,
                                                                color = ~col_by)) +
     #ggplot2::theme_classic() + 
-    ggplot2::ylab(y_val) + ggplot2::xlab(x_val) +
-    ggplot2::geom_point() + ggplot2::geom_jitter(shape = 16, size = size) 
+    ggplot2::ylab(y_val) + ggplot2::xlab(x_val)
+  
+  if (ggrastr){
+    if (!requireNamespace("ggrastr", quietly = TRUE)){
+      stop("Package \"ggrastr\" needed to make rasterized images. Please install it.",
+           call. = FALSE)
+    }
+    plot_base <- plot_base +
+      ggrastr::geom_point_rast(size = size,
+                               scale = raster_scale, raster.dpi = raster_res) +
+      ggrastr::geom_jitter_rast(shape = 16, size = size)
+  } else {
+    plot_base <- plot_base +
+      ggplot2::geom_point() +
+      ggplot2::geom_jitter(shape = 16, size = size) 
+    
+  }
+  
   if(is.null(col_by)){
     plot_base <- plot_base + 
       ggplot2::theme(axis.title.x=ggplot2::element_blank(),
@@ -678,6 +722,13 @@ jitterPlot <- function(seurat_object, y_val, x_val,
 #' @param dodge OPTIONAL how to adjust the placement of the violin plot. Default is 1
 #' @param width OPTIONAL how to adjust how wide the violin plots are. Default is 0.9
 #' @param size OPTIONAL the size of the points for the jitter plot. Default is 1.
+#' @param ggrastr OPTINAL If the plot should be rastarized. This is mostly helpful
+#' for large datasets. All of the points will be a png while the rest will still
+#' be editable. Default is FALSE (don't rasterize the plot)
+#' @param raster_scale OPTIONAL The scale to use. Can be helpful if the rasterized
+#' plot looks fuzzy. Default is 1
+#' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
+#' looks fuzzy. Default is 300.
 #' @keywords internal
 #' @import tidyverse
 #' @import RColorBrewer
@@ -688,7 +739,11 @@ violinPlot <- function(seurat_object, y_val, x_val,
                        plot_jitter = FALSE,
                        plot_median = TRUE,
                        dodge = 1, width = 0.9,
-                       assay = NULL, size = 1) {
+                       assay = NULL, size = 1,
+                       ggrastr = FALSE,
+                       raster_scale = 1, 
+                       raster_res = 300) {
+  
   plot_data <- plotDF(seurat_object, y_val, x_val,
                       col_by, assay = assay)
   # Determine the number of different colors needed.
@@ -712,7 +767,21 @@ violinPlot <- function(seurat_object, y_val, x_val,
       ggplot2::theme(axis.text.x = element_text(angle = 45, hjust = 1))
   }
   if (plot_jitter) {
-    plot_base <- plot_base + ggplot2::geom_jitter(shape = 16, size = size)
+    if (ggrastr){
+      if (!requireNamespace("ggrastr", quietly = TRUE)){
+        stop("Package \"ggrastr\" needed to make rasterized images. Please install it.",
+             call. = FALSE)
+      }
+      plot_base <- plot_base +
+        ggrastr::geom_point_rast(size = size,
+                                 scale = raster_scale, raster.dpi = raster_res) +
+        ggrastr::geom_jitter_rast(shape = 16, size = size)
+    } else {
+      plot_base <- plot_base +
+        ggplot2::geom_point() +
+        ggplot2::geom_jitter(shape = 16, size = size) 
+      
+    }
   }
   
   if (is.null(color)) {
