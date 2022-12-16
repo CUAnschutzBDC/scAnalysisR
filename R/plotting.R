@@ -673,12 +673,10 @@ jitterPlot <- function(seurat_object, y_val, x_val,
            call. = FALSE)
     }
     plot_base <- plot_base +
-      ggrastr::geom_point_rast(size = size,
-                               scale = raster_scale, raster.dpi = raster_res) +
-      ggrastr::geom_jitter_rast(shape = 16, size = size)
+      ggrastr::geom_jitter_rast(shape = 16, size = size,
+                                scale = raster_scale, raster.dpi = raster_res)
   } else {
     plot_base <- plot_base +
-      ggplot2::geom_point() +
       ggplot2::geom_jitter(shape = 16, size = size) 
     
   }
@@ -773,12 +771,10 @@ violinPlot <- function(seurat_object, y_val, x_val,
              call. = FALSE)
       }
       plot_base <- plot_base +
-        ggrastr::geom_point_rast(size = size,
-                                 scale = raster_scale, raster.dpi = raster_res) +
-        ggrastr::geom_jitter_rast(shape = 16, size = size)
+        ggrastr::geom_jitter_rast(shape = 16, size = size, scale = raster_scale,
+                                  raster.dpi = raster_res)
     } else {
       plot_base <- plot_base +
-        ggplot2::geom_point() +
         ggplot2::geom_jitter(shape = 16, size = size) 
       
     }
