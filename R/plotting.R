@@ -1112,7 +1112,7 @@ stacked_barplots <- function(seurat_object, meta_col, color = NULL,
       ggplot2::ylab("Count")
   }
   bar_plot <- bar_plot +
-    ggplot2::geom_bar(position = "fill", stat = "identity") +
+    ggplot2::geom_bar(stat = "identity") +
     ggplot2::scale_fill_manual(values = color) +
     ggplot2::xlab(split_by) +
     ggplot2::labs(fill = meta_col)
