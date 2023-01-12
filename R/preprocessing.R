@@ -49,6 +49,15 @@ create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
   } else {
     stop("tenx_structure must be 'multi', 'count', or 'none'")
   }
+  if(!dir.exists(sample_path)){
+    stop(paste0("Path to data does not exist: ", sample_path,
+                "\nCommon problems:\nYour sample name does not match an ",
+                "existing directory.\nThe tenx_structure does not match ",
+                "the file structure in your directories. Multi expects ",
+                "samples/outs/count whle count expects sample/outs and ",
+                "neither expects sample relative to this script or project."))
+  }
+
   sample_data <- Read10X(data.dir = sample_path)
   if (ADT | hashtag){
     sample_object <- CreateSeuratObject(counts = sample_data[["Gene Expression"]],
