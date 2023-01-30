@@ -29,6 +29,9 @@
 #' @param cor_cutoff OPTIONAL The correlation value to use to determine if a cell type
 #' is named. If no cell types have a correlation above this value for a given cluster,
 #' that cluster will be named "undetermined" in the final output. Default is 0.5
+#' @param features OPTIONAL A list of features to use instead of running FindVariableFeatures
+#' Default is NULL. If set, will override the nfeatures argument. This is helpful if you
+#' specifically want to exclude features (for example Ig genes or TCR genes).
 #' @return a list containing the correlation matricies and the seurat object with a new
 #' meta data column including the identified cell type.
 #' @import tidyverse
@@ -47,7 +50,8 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
                           assay = "RNA",
                           nfeatures = 1000, clusters = "RNA_cluster",
                           plot_type = "rna.umap",
-                          cor_cutoff = 0.5){
+                          cor_cutoff = 0.5,
+                          features = NULL){
   
   # Ask user to install clustifyr to use this function
   if (!requireNamespace("clustifyr", quietly = TRUE)){
@@ -75,15 +79,19 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
   DefaultAssay(seurat_object) <- assay
   seurat_mat <- GetAssayData(object = seurat_object, slot = "data")
   
-  # Find only 1000 variable features
-  
-  seurat_var <- FindVariableFeatures(
-    seurat_object,
-    assay = assay,
-    selection.method = "vst",
-    nfeatures = nfeatures
-  )
-  seurat_genes <- VariableFeatures(seurat_var)
+  if(is.null(features)){
+    # Find only the specified number of variable features
+    seurat_var <- FindVariableFeatures(
+      seurat_object,
+      assay = assay,
+      selection.method = "vst",
+      nfeatures = nfeatures
+    )
+    seurat_genes <- VariableFeatures(seurat_var)    
+    } else {
+      seurat_genes <- features
+    }
+
   
   # RNA
   

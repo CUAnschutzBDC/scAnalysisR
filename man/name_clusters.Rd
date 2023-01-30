@@ -14,7 +14,8 @@ name_clusters(
   nfeatures = 1000,
   clusters = "RNA_cluster",
   plot_type = "rna.umap",
-  cor_cutoff = 0.5
+  cor_cutoff = 0.5,
+  features = NULL
 )
 }
 \arguments{
@@ -55,6 +56,10 @@ type in the seurat object. Default is "rna.umap".}
 \item{cor_cutoff}{OPTIONAL The correlation value to use to determine if a cell type
 is named. If no cell types have a correlation above this value for a given cluster,
 that cluster will be named "undetermined" in the final output. Default is 0.5}
+
+\item{features}{OPTIONAL A list of features to use instead of running FindVariableFeatures
+Default is NULL. If set, will override the nfeatures argument. This is helpful if you
+specifically want to exclude features (for example Ig genes or TCR genes).}
 }
 \value{
 a list containing the correlation matricies and the seurat object with a new
