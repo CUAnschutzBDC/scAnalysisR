@@ -386,7 +386,7 @@ save_gost <- function(gost_output, save_dir_plots, save_dir_text = NULL,
     gost_plots <- gost_output$go_plots
     invisible(lapply(names(gost_plots), function(x){
       pdf(file.path(save_dir_plots, paste0(x, "GSE.pdf")))
-      gost_plots[[x]]
+      print(gost_plots[[x]])
       dev.off()
     }))
   }
