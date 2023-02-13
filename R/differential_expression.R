@@ -217,6 +217,7 @@ run_pathview <- function(gene_matrix, path_id, path_name = NULL,
 #' be to plot. Default is 5.
 #' @param pval OPTIONAL the pvalue to use as a cutoff, default is 0.05
 #' @param correction_method OPTIONAL what correction method to use. Default is 'fdr'
+#' @param keep_root OPTIONAL if the root term should be kept.
 #' @param ... Other arguments past to gprofiler2::gost
 #' @return A list containing two items, gost_output and go_plots
 #' @import tidyverse
@@ -232,7 +233,8 @@ run_gost <- function(seurat_de = NULL, seurat_object = NULL,
                      sources = c("GO:BP", "KEGG", "REAC", "TF"),
                      plot_colors = c("blue", "red"),
                      intersection_cutoff = 5, pval = 0.05,
-                     correction_method = "fdr", ...){
+                     correction_method = "fdr",
+                     keep_root = TRUE, ...){
 
   # Ask user to install pathview to use this function
   if (!requireNamespace("gprofiler2", quietly = TRUE)){
@@ -263,6 +265,11 @@ run_gost <- function(seurat_de = NULL, seurat_object = NULL,
                                   user_threshold = pval,
                                   correction_method = correction_method,
                                   ...)
+
+  if(!keep_root){
+    gost_output$result <- gost_output$result[!grepl("root"),
+                                             gost_output$result,]
+  }
 
   # Separate this out into it's own function I think, a function where you
   # only pass it the gost_output and sources.

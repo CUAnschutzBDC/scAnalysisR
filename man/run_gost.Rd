@@ -13,6 +13,7 @@ run_gost(
   intersection_cutoff = 5,
   pval = 0.05,
   correction_method = "fdr",
+  keep_root = TRUE,
   ...
 )
 }
@@ -36,6 +37,8 @@ be to plot. Default is 5.}
 \item{pval}{OPTIONAL the pvalue to use as a cutoff, default is 0.05}
 
 \item{correction_method}{OPTIONAL what correction method to use. Default is 'fdr'}
+
+\item{keep_root}{OPTIONAL if the root term should be kept.}
 
 \item{...}{Other arguments past to gprofiler2::gost}
 }
