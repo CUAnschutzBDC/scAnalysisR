@@ -209,12 +209,15 @@ run_pathview <- function(gene_matrix, path_id, path_name = NULL,
 #' Must provide either a seurat object or seurat de
 #' @param seurat_object OPTIONAL A seurat object that has already been
 #' normalized. Must provide either a seurat object or a seurat de.
+#' @param organism OPTIONAL What organism to use. Will be past to gprofiler2::gost
 #' @param sources OPTIONAL a list of what sources to plot. Can be any sources
 #' returned by gost. Default is GO:BP, KEGG, REAC and TF
 #' @param plot_colors OPTIONAL colors for the samples. Default is blue to red.
 #' @param intersection_cutoff OPTIONAL how many intersecting genes there must
 #' be to plot. Default is 5.
 #' @param pval OPTIONAL the pvalue to use as a cutoff, default is 0.05
+#' @param correction_method OPTIONAL what correction method to use. Default is 'fdr'
+#' @param ... Other arguments past to gprofiler2::gost
 #' @return A list containing two items, gost_output and go_plots
 #' @import tidyverse
 #' @export
@@ -225,9 +228,11 @@ run_pathview <- function(gene_matrix, path_id, path_name = NULL,
 #'}
 
 run_gost <- function(seurat_de = NULL, seurat_object = NULL,
+                     organism = "mmusculus",
                      sources = c("GO:BP", "KEGG", "REAC", "TF"),
                      plot_colors = c("blue", "red"),
-                     intersection_cutoff = 5, pval = 0.05, ...){
+                     intersection_cutoff = 5, pval = 0.05,
+                     correction_method = "fdr", ...){
 
   # Ask user to install pathview to use this function
   if (!requireNamespace("gprofiler2", quietly = TRUE)){
@@ -254,12 +259,11 @@ run_gost <- function(seurat_de = NULL, seurat_object = NULL,
   names(gene_list) <- unique(marker_genes_gost$cluster)
   
   gost_output <- gprofiler2::gost(query = gene_list,
-                                  organism = "mmusculus",
-                                  multi_query = FALSE,
-                                  ordered_query = FALSE,
+                                  organism = organism,
                                   user_threshold = pval,
-                                  custom_bg = NULL,
-                                  correction_method = "fdr")
+                                  correction_method = correction_method,
+                                  ...)
+
   # Separate this out into it's own function I think, a function where you
   # only pass it the gost_output and sources.
   go_plots <- make_go_plots(gost_output = gost_output,

@@ -7,10 +7,12 @@
 run_gost(
   seurat_de = NULL,
   seurat_object = NULL,
+  organism = "mmusculus",
   sources = c("GO:BP", "KEGG", "REAC", "TF"),
   plot_colors = c("blue", "red"),
   intersection_cutoff = 5,
   pval = 0.05,
+  correction_method = "fdr",
   ...
 )
 }
@@ -21,6 +23,8 @@ Must provide either a seurat object or seurat de}
 \item{seurat_object}{OPTIONAL A seurat object that has already been
 normalized. Must provide either a seurat object or a seurat de.}
 
+\item{organism}{OPTIONAL What organism to use. Will be past to gprofiler2::gost}
+
 \item{sources}{OPTIONAL a list of what sources to plot. Can be any sources
 returned by gost. Default is GO:BP, KEGG, REAC and TF}
 
@@ -30,6 +34,10 @@ returned by gost. Default is GO:BP, KEGG, REAC and TF}
 be to plot. Default is 5.}
 
 \item{pval}{OPTIONAL the pvalue to use as a cutoff, default is 0.05}
+
+\item{correction_method}{OPTIONAL what correction method to use. Default is 'fdr'}
+
+\item{...}{Other arguments past to gprofiler2::gost}
 }
 \value{
 A list containing two items, gost_output and go_plots
