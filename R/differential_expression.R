@@ -293,7 +293,7 @@ make_go_plots <- function(gost_output,
                            function(source) make_go_plot_single(
                              gost_output = gost_output,
                              gost_query = query,
-                             gost_source = sources,
+                             gost_source = source,
                              plot_colors = plot_colors,
                              intersection_cutoff = intersection_cutoff)
     )
