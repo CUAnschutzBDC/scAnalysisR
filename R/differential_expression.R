@@ -267,8 +267,9 @@ run_gost <- function(seurat_de = NULL, seurat_object = NULL,
                                   ...)
 
   if(!keep_root){
-    gost_output$result <- gost_output$result[!grepl("root"),
-                                             gost_output$result,]
+    gost_output$result <- gost_output$result[
+      !grepl("root", gost_output$result$term_name),
+      ]
   }
 
   # Separate this out into it's own function I think, a function where you
