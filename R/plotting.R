@@ -976,7 +976,9 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
   
   heatmap_df <- heatmap_df[order(match(rownames(heatmap_df), gene_list)), ]
   
-  
+  # remove any zero values
+  heatmap_df <- heatmap_df[rowSums(heatmap_df) > 0,]
+
   if(is.null(meta_df)){
     # Make a df for the column labeling
     sample_info <- seurat_object[[meta_col]]
