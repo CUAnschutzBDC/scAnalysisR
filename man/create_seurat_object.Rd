@@ -37,8 +37,8 @@ exactly the identity that would be in the rowname. Default is to search for the
 word "Hashtag" in the identity.}
 
 \item{tenx_structure}{OPTIONAL if the file structure is from 10x multi (sample/outs/count),
-10x count (sample/outs/) 10x multi 7 (sample/outs/multi/count or neither (sample).
-Options are "multi" (default), "count", "multi7", or "none"}
+10x count (sample/outs/) 10x multi 7 (sample/outs/per_sample_outs/sample/count) or neither
+(sample). Options are "multi" (default), "count", "multi7", or "none"}
 }
 \value{
 A seurat object with assays for HTO and ADT (if HTO and ADT are true).

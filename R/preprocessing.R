@@ -19,8 +19,8 @@
 #' exactly the identity that would be in the rowname. Default is to search for the 
 #' word "Hashtag" in the identity.
 #' @param tenx_structure OPTIONAL if the file structure is from 10x multi (sample/outs/count),
-#' 10x count (sample/outs/) 10x multi 7 (sample/outs/multi/count or neither (sample). 
-#' Options are "multi" (default), "count", "multi7", or "none"
+#' 10x count (sample/outs/) 10x multi 7 (sample/outs/per_sample_outs/sample/count) or neither
+#' (sample). Options are "multi" (default), "count", "multi7", or "none"
 #' @return A seurat object with assays for HTO and ADT (if HTO and ADT are true). 
 #' If HTO and ADTs are included, those matricies will be normalized by CLR normalization
 #' @import Seurat
@@ -46,11 +46,12 @@ create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
                              "outs", "filtered_feature_bc_matrix")
   }else if (tenx_structure == "multi7"){
     sample_path <- file.path(count_path, sample, "outs",
-                             "multi", "count", "filtered_feature_bc_matrix")
+                             "per_sample_outs", sample, "count",
+                             "sample_filtered_feature_bc_matrix")
   } else if (tenx_structure == "none"){
     sample_path <- file.path(count_path, sample)
   } else {
-    stop("tenx_structure must be 'multi', 'count', or 'none'")
+    stop("tenx_structure must be 'multi', 'count', 'multi7', or 'none'")
   }
   if(!dir.exists(sample_path)){
     stop(paste0("Path to data does not exist: ", sample_path,
