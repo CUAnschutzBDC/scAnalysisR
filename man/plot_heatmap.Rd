@@ -19,6 +19,7 @@ plot_heatmap(
   plot_meta_col = TRUE,
   plot_rownames = TRUE,
   cell_order = NULL,
+  return_data = FALSE,
   ...
 )
 }
@@ -59,12 +60,16 @@ variable genes don't completely controll the color scale. Default is -2.5}
 computed before making the heatmap. This option makes much prettier plots, but
 can be a bit buggy, I'm still working on making it work more robustly.}
 
+\item{return_data}{OPTIONAL If the scaled matrix and count matrix should be returned.
+if TRUE, a list will be returned with the heatmap and both matricies, if FALSE only
+the heatmap will be returned. Default is FALSE}
+
 \item{...}{Other options passed to \code{pheatmap}}
 
 \item{cluster_columns}{OPTIONAL if columns should be clustered. Default is FALSE}
 
 \item{show_rownames}{OPTIONAL if rownames should be printed. Default is TRUE. I generally
-like to print the rownames unless there are too many to be visually pleasng.}
+like to print the rownames unless there are too many to be visually pleasing.}
 }
 \value{
 A pheatmap object with x axis colors based on the meta data column provided

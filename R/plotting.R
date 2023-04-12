@@ -908,7 +908,10 @@ plotDF <- function(seurat_object, y_val, x_val,
 #' computed before making the heatmap. This option makes much prettier plots, but
 #' can be a bit buggy, I'm still working on making it work more robustly.
 #' @param show_rownames OPTIONAL if rownames should be printed. Default is TRUE. I generally
-#' like to print the rownames unless there are too many to be visually pleasng.
+#' like to print the rownames unless there are too many to be visually pleasing.
+#' @param return_data OPTIONAL If the scaled matrix and count matrix should be returned.
+#' if TRUE, a list will be returned with the heatmap and both matricies, if FALSE only
+#' the heatmap will be returned. Default is FALSE
 #' @param ... Other options passed to `pheatmap`
 #' @return A pheatmap object with x axis colors based on the meta data column provided
 #' or your own meta_df with color_list.
@@ -936,7 +939,7 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
                          max_val = 2.5, min_val = -2.5, cluster_rows = FALSE,
                          cluster_cols = FALSE, average_expression = FALSE,
                          plot_meta_col = TRUE, plot_rownames = TRUE,
-                         cell_order = NULL, ...){
+                         cell_order = NULL, return_data = FALSE, ...){
   if(average_expression){
     # Find average expression of genes in clusters
     Idents(seurat_object) <- meta_col
@@ -1038,7 +1041,13 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
                                 annotation_colors = coloring, color = blueYellow,
                                 border_color = NA, clustering_method = "complete",
                                 silent = TRUE, ...)
-  return(heatmap)
+  if(return_data){
+    return(list("heatmap" = heatmap,
+                "z_score" = heatmap_scale,
+                "counts" = heatmap_df))
+  } else {
+    return(heatmap)
+  }
 }
 
 #' Create stacked barplot
