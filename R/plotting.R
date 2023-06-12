@@ -1024,6 +1024,8 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
     if (!identical(colnames(heatmap_scale), rownames(sample_info))) {
       heatmap_scale <- heatmap_scale[, rownames(sample_info)]
     }
+  } else {
+    rownames(sample_info) <- sub("-", ".", rownames(sample_info))
   }
   
   if(!plot_meta_col){
