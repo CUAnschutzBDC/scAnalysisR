@@ -917,6 +917,7 @@ plotDF <- function(seurat_object, y_val, x_val,
 #' or your own meta_df with color_list.
 #' @import tidyverse
 #' @import RColorBrewer
+#' @import grDevices
 #' @export
 #' @examples
 #' \dontrun{
@@ -990,8 +991,9 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
       sample_info[[meta_col]] <- factor(sample_info[[meta_col]])
     }
     if(is.null(colors)){
-      colors <- brewer.pal(length(levels(sample_info[[meta_col]])), "Set1")
-      names(colors) <- levels(sample_info[[meta_col]])
+        colorcount <- length(levels(sample_info[[meta_col]]))
+        colors <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(9, "Set1"))(colorcount)
+        names(colors) <- levels(sample_info[[meta_col]])
     } 
     # make a list for the column labeing
     coloring <- list(colors)

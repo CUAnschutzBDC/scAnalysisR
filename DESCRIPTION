@@ -14,7 +14,8 @@ Imports: Seurat,
     openxlsx,
     biomaRt,
     Matrix,
-    pheatmap
+    pheatmap,
+    gridExtra
 Suggests:
     clustifyr,
     pathview,
