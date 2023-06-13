@@ -34,7 +34,10 @@
 #' specifically want to exclude features (for example Ig genes or TCR genes).
 #' @return a list containing the correlation matricies and the seurat object with a new
 #' meta data column including the identified cell type.
-#' @import tidyverse
+#' @import Seurat
+#' @importFrom pheatmap pheatmap
+#' @importFrom viridisLite viridis
+#' @importFrom grDevices dev.off pdf
 #' @export
 #' @examples
 #' \dontrun{
@@ -102,7 +105,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
   seurat_object[[clusters]] <- seurat_metadata[[clusters]]
   
   # Run clustify
-  seurat_res <- clustify(
+  seurat_res <- clustifyr::clustify(
     input = seurat_mat,
     metadata = seurat_metadata,
     ref_mat = ref_mat,
@@ -114,7 +117,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
   
   pheatmap::pheatmap(seurat_res, color = viridisLite::viridis(10))
   
-  seurat_cluster <- cor_to_call(seurat_res) %>%
+  seurat_cluster <- clustifyr::cor_to_call(seurat_res) %>%
     mutate(type = ifelse(r < cor_cutoff, "undetermined", type))
   new_clusters <- seurat_cluster$type
   names(new_clusters) <- seurat_cluster$cluster
@@ -132,13 +135,13 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
                         plot_type = "wnn.umap")
   }
   
-  pdf(file.path(save_dir, "images", paste0("RNA_mapping_", save_name, ".pdf")))
+  grDevices::pdf(file.path(save_dir, "images", paste0("RNA_mapping_", save_name, ".pdf")))
   print(plot1)
   if(ADT){
     print(plot2)
     print(plot3)
   }
-  dev.off()
+  grDevices::dev.off()
   
   if(ADT){
     # ADT
@@ -150,7 +153,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     seurat_object[[clusters]] <- seurat_metadata[[clusters]]
     
     # Run clustify
-    seurat_res <- clustify(
+    seurat_res <- clustifyr::clustify(
       input = seurat_mat,
       metadata = seurat_metadata,
       ref_mat = ref_mat,
@@ -160,7 +163,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     
     return_list$ADT <- seurat_res
     
-    seurat_cluster <- cor_to_call(seurat_res) %>%
+    seurat_cluster <- clustifyr::cor_to_call(seurat_res) %>%
       mutate(type = ifelse(r < cor_cutoff, "undetermined", type))
     new_clusters <- seurat_cluster$type
     names(new_clusters) <- seurat_cluster$cluster
@@ -176,12 +179,12 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     plot3 <- plotDimRed(seurat_object, col_by = colname,
                         plot_type = "wnn.umap")
     
-    pdf(file.path(save_dir, "images", paste0("ADT_mapping_",
+    grDevices::pdf(file.path(save_dir, "images", paste0("ADT_mapping_",
                                              save_name, ".pdf")))
     print(plot1)
     print(plot2)
     print(plot3)
-    dev.off()
+    grDevices::dev.off()
     
     # Combined
     clusters <- "combined_cluster"
@@ -192,7 +195,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     seurat_object[[clusters]] <- seurat_metadata[[clusters]]
     
     # Run clustify
-    seurat_res <- clustify(
+    seurat_res <- clustifyr::clustify(
       input = seurat_mat,
       metadata = seurat_metadata,
       ref_mat = ref_mat,
@@ -202,7 +205,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     
     return_list$WNN <- seurat_res
     
-    seurat_cluster <- cor_to_call(seurat_res) %>%
+    seurat_cluster <- clustifyr::cor_to_call(seurat_res) %>%
       mutate(type = ifelse(r < cor_cutoff, "undetermined", type))
     new_clusters <- seurat_cluster$type
     names(new_clusters) <- seurat_cluster$cluster
@@ -218,12 +221,12 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     plot3 <- plotDimRed(seurat_object, col_by = colname,
                         plot_type = "wnn.umap")
     
-    pdf(file.path(save_dir, "images", paste0("combined_mapping_",
+    grDevices::pdf(file.path(save_dir, "images", paste0("combined_mapping_",
                                              save_name, ".pdf")))
     print(plot1)
     print(plot2)
     print(plot3)
-    dev.off()
+    grDevices::dev.off()
     
   }
   return_list$object <- seurat_object

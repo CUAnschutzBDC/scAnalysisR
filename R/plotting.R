@@ -28,9 +28,7 @@
 #' column.
 #' @param ... OPTIONAL arguments supplied to plotDimRedSingle
 #' @return a list of plots colored by the given parameteres
-#' @import tidyverse
-#' @import RColorBrewer
-#' @import viridis
+#' @importFrom grDevices dev.off pdf
 #' @export
 #' @examples
 #' \dontrun{
@@ -57,9 +55,9 @@ plotDimRed <- function(sample_object, col_by, save_plot = NULL,
                      group = group, meta_data_col = meta_data_col, ...)
   })
   if (!is.null(save_plot)){
-    pdf(save_plot)
+    grDevices::pdf(save_plot)
     print(plot_list)
-    dev.off()
+    grDevices::dev.off()
   }
   return(plot_list)
 }
@@ -86,15 +84,13 @@ plotDimRed <- function(sample_object, col_by, save_plot = NULL,
 #' only highlight one cluster, meta_data_col = "cluster".
 #' @param group OPTIONAL The group to color. This group must be present in the selected 
 #' meta data column.
-#' @param assasy OPTIONAL The assay to use to color the plot. This is mostly useful if
+#' @param assay OPTIONAL The assay to use to color the plot. This is mostly useful if
 #' you have the same names in your ADT and RNA slots so you can ensure you plot the
 #' correct one.
 #' @param ... OPTIONAL arguments supplied to groupDiscretePlots, groupContinuousPlots,
 #' discretePlots, or continuousPlots
 #' @keywords internal
-#' @import tidyverse
-#' @import RColorBrewer
-#' @import viridis
+#' @import Seurat
 #' @export
 
 plotDimRedSingle <- function(seurat_object, col_by, plot_type = "umap",
@@ -211,8 +207,9 @@ plotDimRedSingle <- function(seurat_object, col_by, plot_type = "umap",
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
 #' @keywords internal
-#' @import tidyverse
+#' @import ggplot2
 #' @import RColorBrewer
+#' @importFrom grDevices colorRampPalette
 #' @export
 
 discretePlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
@@ -278,8 +275,9 @@ discretePlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
 #' @keywords internal
-#' @import tidyverse
-#' @import viridis
+#' @import ggplot2
+#' @import RColorBrewer
+#' @importFrom grDevices colorRampPalette
 #' @export
 
 continuousPlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
@@ -341,8 +339,9 @@ continuousPlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
 #' @keywords internal
-#' @import tidyverse
+#' @import ggplot2
 #' @import RColorBrewer
+#' @importFrom grDevices colorRampPalette
 #' @export
 
 groupDiscretePlots <- function(group, plot_df, col_by, axis_names = c("dim1", "dim2"),
@@ -434,8 +433,9 @@ groupDiscretePlots <- function(group, plot_df, col_by, axis_names = c("dim1", "d
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
 #' @keywords internal
-#' @import tidyverse
-#' @import viridis
+#' @import ggplot2
+#' @import RColorBrewer
+#' @importFrom grDevices colorRampPalette
 #' @export
 
 groupContinuousPlots <- function(group, plot_df, col_by, color = NULL,
@@ -541,12 +541,15 @@ groupContinuousPlots <- function(group, plot_df, col_by, color = NULL,
 #' returned as a list. Default (TRUE) returns a figure.
 #' @param dodge OPTIONAL how to adjust the placement of the violin plot. Default is 1
 #' @param width OPTIONAL how to adjust how wide the violin plots are. Default is 0.9
+#' @param assay OPTIONAL The assay to use to color the plot. This is mostly useful if
+#' you have the same names in your ADT and RNA slots so you can ensure you plot the
+#' correct one.
 #' @param ... arguments passed to other functions
 #' @return Either a list of plots (if combine = FALSE) or a gridExtra object with all
 #' plots stacked (if combine = TRUE)
-#' @import tidyverse
-#' @import RColorBrewer
-#' @import gridExtra
+#' @importFrom stats setNames
+#' @import ggplot2
+#' @importFrom gridExtra arrangeGrob
 #' @export
 #' @examples
 #' \dontrun{
@@ -575,7 +578,7 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
                          save_plot = NULL, col_by = NULL,
                          plot_median = TRUE, combine = TRUE,
                          dodge = 1, width = 0.9, assay = NULL, ...){
-  geneset <- setNames(geneset, geneset)
+  geneset <- stats::setNames(geneset, geneset)
   if (plot_type == "jitter") {
     # Make jitter plots colored by cell cycle stage
     if(cell_cycle){
@@ -644,9 +647,13 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
 #' plot looks fuzzy. Default is 1
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
+#' @param assay OPTIONAL The assay to use to color the plot. This is mostly useful if
+#' you have the same names in your ADT and RNA slots so you can ensure you plot the
+#' correct one.
 #' @keywords internal
-#' @import tidyverse
+#' @import ggplot2
 #' @import RColorBrewer
+#' @importFrom grDevices colorRampPalette
 #' @export
 
 jitterPlot <- function(seurat_object, y_val, x_val,
@@ -727,9 +734,14 @@ jitterPlot <- function(seurat_object, y_val, x_val,
 #' plot looks fuzzy. Default is 1
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
+#' @param assay OPTIONAL The assay to use to color the plot. This is mostly useful if
+#' you have the same names in your ADT and RNA slots so you can ensure you plot the
+#' correct one.
 #' @keywords internal
-#' @import tidyverse
+#' @importFrom stats median
+#' @import ggplot2
 #' @import RColorBrewer
+#' @importFrom grDevices colorRampPalette
 #' @export
 
 violinPlot <- function(seurat_object, y_val, x_val,
@@ -792,7 +804,7 @@ violinPlot <- function(seurat_object, y_val, x_val,
   }
   if(plot_median){
     plot_base <- plot_base +
-      ggplot2::stat_summary(fun = median, geom = "point", size = 2,
+      ggplot2::stat_summary(fun = stats::median, geom = "point", size = 2,
                             position = ggplot2::position_dodge(dodge))
   }
   
@@ -807,8 +819,11 @@ violinPlot <- function(seurat_object, y_val, x_val,
 #' @param y_val What to use to create the y-axis
 #' @param x_val What to use to separate along the x-axis
 #' @param col_by OPTIONAL what to use to color the cells (or violins).
+#' @param assay OPTIONAL The assay to use to color the plot. This is mostly useful if
+#' you have the same names in your ADT and RNA slots so you can ensure you plot the
+#' correct one.
 #' @keywords internal
-#' @import tidyverse
+#' @import Seurat
 #' @export
 
 plotDF <- function(seurat_object, y_val, x_val,
@@ -823,7 +838,7 @@ plotDF <- function(seurat_object, y_val, x_val,
     stop(paste0("gene (", y_val, ") is not present in your chosen assay"))
   } else if (y_val == "cluster" | y_val == "Cluster"){
     plot_data <- as.data.frame(Idents(object = seurat_object))
-  }else if (y_val %in% rownames(seurat_object) |
+  } else if (y_val %in% rownames(seurat_object) |
             y_val %in% colnames(seurat_object[[]])){
     plot_data <- FetchData(object = seurat_object, vars = y_val)
   }else if ("ADT" %in% Seurat::Assays(seurat_object) &&
@@ -853,7 +868,8 @@ plotDF <- function(seurat_object, y_val, x_val,
     rownames(plot_data) <- plot_data$Row.names
     plot_data$Row.names <- NULL
   } else {
-    stop("x_val must be a metric from meta data or 'cluster'")
+        stop(paste0("x value (", x_val,
+                ") must be a gene, metric from meta data or 'cluster'"))
   }
   
   # Name the appropriate column of the plotting data
@@ -903,21 +919,29 @@ plotDF <- function(seurat_object, y_val, x_val,
 #' @param min_val OPTIONAL What value to cap the z-score shown. This makes it so highly
 #' variable genes don't completely controll the color scale. Default is -2.5
 #' @param cluster_rows OPTIONAL if rows should be clustered. Default is FALSE
-#' @param cluster_columns OPTIONAL if columns should be clustered. Default is FALSE
+#' @param cluster_cols OPTIONAL if columns should be clustered. Default is FALSE
 #' @param average_expression OPTIONAL if the average expression of clusters should be 
 #' computed before making the heatmap. This option makes much prettier plots, but
 #' can be a bit buggy, I'm still working on making it work more robustly.
-#' @param show_rownames OPTIONAL if rownames should be printed. Default is TRUE. I generally
+#' @param plot_meta_col OPTIONAL if the column used from the "meta_col" should be plotted.
+#' This is set to TRUE. I set to FALSE if I want to plot based on multiple parts of the
+#' metadata (ie sample and cell type). I have the meta data set to sample_celltype but
+#' I want those plotted separately.
+#' @param plot_rownames OPTIONAL if rownames should be printed. Default is TRUE. I generally
 #' like to print the rownames unless there are too many to be visually pleasing.
+#' @param cell_order OPTIONAL default is NULL order based on clustering or the levels of
+#' metadata. If you have a specific order that you want to plot your cells in, provide
+#' those here. These must be identical to the cells in your seurat object.
 #' @param return_data OPTIONAL If the scaled matrix and count matrix should be returned.
 #' if TRUE, a list will be returned with the heatmap and both matricies, if FALSE only
 #' the heatmap will be returned. Default is FALSE
 #' @param ... Other options passed to `pheatmap`
 #' @return A pheatmap object with x axis colors based on the meta data column provided
 #' or your own meta_df with color_list.
-#' @import tidyverse
+#' @import Seurat
 #' @import RColorBrewer
-#' @import grDevices
+#' @importFrom grDevices colorRampPalette
+#' @importFrom pheatmap pheatmap
 #' @export
 #' @examples
 #' \dontrun{
@@ -964,7 +988,8 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
         rownames(meta_df) <- meta_df[[meta_col]]
       }
       if(is.null(colors)){
-        colors <- brewer.pal(length(levels(sample_info[[meta_col]])), "Set1")
+        colorcount <- length(levels(sample_info[[meta_col]]))
+        colors <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(9, "Set1"))(colorcount)
         names(colors) <- levels(sample_info[[meta_col]])
       } 
       # make a list for the column labeing
@@ -1075,8 +1100,11 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
 #' @return Either a stacked barplot based on the count or percent of each meta data group
 #' in your sample (if return_values = FALSE) or a data frame with the count and percent
 #' values of each meta data group in your sample (if return_values = TRUE).
-#' @import tidyverse
+#' @import Seurat
+#' @import ggplot2
 #' @import RColorBrewer
+#' @importFrom dplyr rename group_by mutate
+#' @importFrom grDevices colorRampPalette
 #' @export
 #' @examples
 #' \dontrun{
@@ -1113,7 +1141,9 @@ stacked_barplots <- function(seurat_object, meta_col, color = NULL,
     dplyr::mutate(percents = Freq/sum(Freq) * 100)
   # Add colors if not provided
   if(is.null(color)){
-    color <- brewer.pal(length(unique(meta_data$meta_col)), "Set1")
+    colorcount <- length(unique(meta_data$meta_col))
+    color <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(9, "Set1"))(colorcount)
+    names(color) <- levels(unique(meta_data$meta_col))
   }
   if(percent){
     bar_plot <- ggplot2::ggplot(meta_data, ggplot2::aes(x = split_by,

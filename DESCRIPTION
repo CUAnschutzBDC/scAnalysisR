@@ -6,16 +6,21 @@ Authors@R:
            comment = c(ORCID = "0000-0002-7466-8164"))
 Description: Packages to aid in the analysis of single cell RNA-seq data. Many functions are wrappers around seurat and ggplot. Requires seurat objects.
 Depends: R (>= 3.5.1)
-License: MIT License
+License: MIT + file LICENSE
 Imports: Seurat,
-    tidyverse,
-    viridis,
+    dplyr,
+    tibble,
+    tidyr,
+    ggplot2,
+    stringr,
     RColorBrewer,
     openxlsx,
     biomaRt,
     Matrix,
     pheatmap,
-    gridExtra
+    gridExtra,
+    gprofiler2,
+    viridisLite
 Suggests:
     clustifyr,
     pathview,

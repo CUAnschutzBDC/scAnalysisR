@@ -26,6 +26,9 @@ markers. Default is RNA_cluster.}
 \item{assay}{OPTIONAL the assay to run the differential expression.
 Default is RNA.}
 
+\item{pval}{OPTIONAL The cutoff for p value for returned genes.
+Default is 0.05}
+
 \item{logfc}{OPTIONAL The cutoff for the log fold change for returned
 genes. Default is 0.5.}
 
@@ -39,9 +42,6 @@ included, no hypergeometric tests will be run.}
 in a pairwise fashion for all groups vs all groups (TRUE) or in a one vs
 all fashion (FALSE). FindMarkers from Seurat defaults to the one vs all
 approach. Default is FALSE.}
-
-\item{p_val}{OPTIONAL The cutoff for p value for returned genes.
-Default is 0.05}
 }
 \value{
 A dataframe containing all markers. It will also write a csv file

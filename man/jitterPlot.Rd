@@ -28,6 +28,10 @@ jitterPlot(
 
 \item{color}{OPTIONAL The color palette used to color. Default is Set1 from RColorBrewer}
 
+\item{assay}{OPTIONAL The assay to use to color the plot. This is mostly useful if
+you have the same names in your ADT and RNA slots so you can ensure you plot the
+correct one.}
+
 \item{size}{OPTIONAL The size for the points. Default is 1}
 
 \item{ggrastr}{OPTINAL If the plot should be rastarized. This is mostly helpful

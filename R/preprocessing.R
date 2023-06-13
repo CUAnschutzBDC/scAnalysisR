@@ -118,6 +118,7 @@ create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
 #' is NULL
 #' @return A seurat object with an added reduction named based on the reduction_name
 #' given or based on the rules described above.
+#' @import Seurat
 #' @export
 #' @examples
 #' \dontrun{
@@ -187,6 +188,7 @@ PCA_dimRed <- function(sample_object, assay = "RNA",
 #' @return A named list of plots that differ based on the above parameters. Possibilities
 #' include: orig.ident, percent.mt, nFeature_RNA, nCount_RNA, HTO_classification,
 #' nFeature_ADT, nCount_ADT, nFeature_spatial, nCount_spatial, pca_loadings, and jackstraw
+#' @import Seurat
 #' @export
 #' @examples
 #' \dontrun{
@@ -287,6 +289,7 @@ plot_PCA <- function(sample_object, HTO = FALSE, ADT = FALSE,
 #' if assay = "RNA", SCT_cluster if assay = "SCT", integrated_cluster if assay = 
 #' "integrated", and ADT_cluster if assay = "ADT"), and a new UMAP reduction named
 #' by the reduction you started with.
+#' @import Seurat
 #' @export
 #' @examples
 #' \dontrun{

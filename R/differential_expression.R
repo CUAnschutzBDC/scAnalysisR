@@ -9,16 +9,19 @@
 #' @param seurat_de OPTIONAL the returned object from find_markers. If not 
 #' provided, find markers will be run. Must provide either a seurat object or
 #' a seurat de.
-#' @param seurat_assay OPTIONAL which assay to pull the data from when
-#' performing DE. Default is "RNA"
 #' @param out_dir OPTIONAL an output directory for the pathview plots. Default
 #' it "pathview"
 #' @param pval OPTIONAL the pvalue cutoff for the adjusted pvalue from the DE
 #' test. Default is 0.05.
+#' @param gen_id OPTIONAL the id of the species, "mmu" for mouse "hsa" for human
+#' see pathview for other options.
 #' @param ... OPTIONAL arguments supplied to find_markers
 #' @return Nothing is returned, instead pathview plots are made and saved in
 #' the specified directory
-#' @import tidyverse
+#' @importFrom dplyr filter
+#' @importFrom tidyr pivot_wider
+#' @importFrom tibble column_to_rownames
+#' @import Seurat
 #' @export
 #' @examples
 #' \dontrun{
@@ -83,7 +86,7 @@ de_to_pathview <- function(path_id_list, seurat_object = NULL,
 #' @param group_ident_2 OPTIONAL which sample to use as the second group
 #' if more than 2 samples are in the seurat object.
 #' @return A dataframe containing all markers.
-#' @import tidyverse
+#' @import Seurat
 #' @export
 #' @examples
 #' \dontrun{
@@ -142,7 +145,7 @@ find_markers <- function(seurat_object,
 #' @param gen_id OPTIONAL the species ID. Default is "mmu" for mouse. Set if 
 #' you aren't using mouse
 #' @keywords internal
-#' @import tidyverse
+#' @importFrom stringr str_c
 #' @export
 
 run_pathview <- function(gene_matrix, path_id, path_name = NULL,
@@ -163,20 +166,20 @@ run_pathview <- function(gene_matrix, path_id, path_name = NULL,
   out_dir %>%
     dir.create(showWarnings = F)
   
-  pathview_out <- pathview(gene.data = gene_matrix,
-                           species = gen_id,
-                           pathway.id = path_id,
-                           gene.idtype = "SYMBOL",
-                           kegg.dir = out_dir,
-                           multi.state = multi_state,
-                           match.data = multi_state,
-                           low = list(gene = "#225ea8", cpd = "blue"),
-                           mid = list(gene = "white", cpd = "gray"),
-                           high = list(gene = "#e31a1c", cpd = "yellow"),
-                           na.col = "#bdbdbd")
+  pathview_out <- pathview::pathview(gene.data = gene_matrix,
+                                     species = gen_id,
+                                     pathway.id = path_id,
+                                     gene.idtype = "SYMBOL",
+                                     kegg.dir = out_dir,
+                                     multi.state = multi_state,
+                                     match.data = multi_state,
+                                     low = list(gene = "#225ea8", cpd = "blue"),
+                                     mid = list(gene = "white", cpd = "gray"),
+                                     high = list(gene = "#e31a1c", cpd = "yellow"),
+                                     na.col = "#bdbdbd")
   
   if(multi_state){
-    orig_name <- str_c(gene_id, path_id, ".pathview.png")
+    orig_name <- str_c(gen_id, path_id, ".pathview.png")
     new_name <- str_c(out_dir, "/", gen_id, path_name,
                       ".pathview.png")
     file.rename(orig_name, new_name)
@@ -220,7 +223,8 @@ run_pathview <- function(gene_matrix, path_id, path_name = NULL,
 #' @param keep_root OPTIONAL if the root term should be kept.
 #' @param ... Other arguments past to gprofiler2::gost
 #' @return A list containing two items, gost_output and go_plots
-#' @import tidyverse
+#' @importFrom dplyr arrange filter
+#' @importFrom gprofiler2 gost
 #' @export
 #' @examples
 #' \dontrun{
@@ -293,7 +297,6 @@ run_gost <- function(seurat_de = NULL, seurat_object = NULL,
 #' @param intersection_cutoff OPTIONAL how many intersecting genes there must
 #' be to plot. Default is 5.
 #' @keywords internal
-#' @import tidyverse
 #' @export
 
 make_go_plots <- function(gost_output,
@@ -328,7 +331,8 @@ make_go_plots <- function(gost_output,
 #' @param intersection_cutoff OPTIONAL how many intersecting genes there must
 #' be to plot. Default is 5.
 #' @keywords internal
-#' @import tidyverse
+#' @importFrom dplyr distinct top_n arrange
+#' @import ggplot2
 #' @export
 
 make_go_plot_single <- function(gost_output, gost_query, gost_source,
@@ -376,7 +380,10 @@ make_go_plot_single <- function(gost_output, gost_query, gost_source,
 #' Requres openxlsx is installed.
 #' @return No return, writes either a csv or excel workbook of gene onotology results
 #' and saves plots to a pdf
-#' @import tidyverse
+#' @importFrom openxlsx createWorkbook addWorksheet writeData saveWorkbook
+#' @importFrom dplyr filter
+#' @importFrom utils write.csv
+#' @importFrom grDevices dev.off pdf
 #' @export
 #' @examples
 #' \dontrun{
@@ -397,9 +404,9 @@ save_gost <- function(gost_output, save_dir_plots, save_dir_text = NULL,
       dir.create(showWarnings = F)
     gost_plots <- gost_output$go_plots
     invisible(lapply(names(gost_plots), function(x){
-      pdf(file.path(save_dir_plots, paste0(x, "GSE.pdf")))
+      grDevices::pdf(file.path(save_dir_plots, paste0(x, "GSE.pdf")))
       print(gost_plots[[x]])
-      dev.off()
+      grDevices::dev.off()
     }))
   }
   # Save to plot directory if text directory isn't provided
@@ -413,13 +420,10 @@ save_gost <- function(gost_output, save_dir_plots, save_dir_text = NULL,
     # Create output directory
     save_dir_text %>%
       dir.create(showWarnings = F)
-    write.csv(gost_text,
+    utils::write.csv(gost_text,
               file.path(save_dir_text, "all_GSE_results.csv"))
   }
   if(save_excel){
-    if("openxlsx" %in% rownames(installed.packages()) == FALSE){
-      install.packages("openxlsx")
-    }
     # Create output directory
     save_dir_text %>%
       dir.create(showWarnings = F)
@@ -458,7 +462,9 @@ save_gost <- function(gost_output, save_dir_plots, save_dir_text = NULL,
 #' Default is 0.05
 #' @param ... OPTIONAL extra arguments passed to FindMarkers
 #' @return A dataframe containing all pairwise markers.
-#' @import tidyverse
+#' @importFrom dplyr filter mutate
+#' @importFrom utils combn
+#' @import Seurat
 #' @export
 #' @examples
 #' \dontrun{
@@ -469,7 +475,7 @@ save_gost <- function(gost_output, save_dir_plots, save_dir_text = NULL,
 pairwise_markers <- function(seurat_object, meta_col,
                              p_val_cutoff = 0.05, ...){
   Idents(seurat_object) <- meta_col
-  combinations <- combn(unique(Idents(seurat_object)), m = 2)
+  combinations <- utils::combn(unique(Idents(seurat_object)), m = 2)
   all_de <- lapply(1:ncol(combinations), function(x){
     ident1 <- combinations[1, x]
     ident2 <- combinations[2, x]
@@ -513,7 +519,7 @@ pairwise_markers <- function(seurat_object, meta_col,
 #' markers. Default is RNA_cluster.
 #' @param assay OPTIONAL the assay to run the differential expression.
 #' Default is RNA.
-#' @param p_val OPTIONAL The cutoff for p value for returned genes.
+#' @param pval OPTIONAL The cutoff for p value for returned genes.
 #' Default is 0.05
 #' @param logfc OPTIONAL The cutoff for the log fold change for returned
 #' genes. Default is 0.5.
@@ -529,8 +535,7 @@ pairwise_markers <- function(seurat_object, meta_col,
 #' @return A dataframe containing all markers. It will also write a csv file
 #' with the DE genes, a csv file with the hypergeometric test output (if run)
 #' and an excel file with both hypergeometric output and DE genes.
-#' @import tidyverse
-#' @import openxlsx
+#' @importFrom openxlsx createWorkbook addWorksheet writeData saveWorkbook
 #' @export
 #' @examples
 #' \dontrun{
@@ -600,7 +605,7 @@ find_write_markers <- function(seurat_object, save_dir,
 #' markers. Default is RNA_cluster.
 #' @param assay OPTIONAL the assay to run the differential expression.
 #' Default is RNA.
-#' @param p_val OPTIONAL The cutoff for p value for returned genes.
+#' @param pval OPTIONAL The cutoff for p value for returned genes.
 #' Default is 0.05
 #' @param logfc OPTIONAL The cutoff for the log fold change for returned
 #' genes. Default is 0.5.
@@ -612,8 +617,9 @@ find_write_markers <- function(seurat_object, save_dir,
 #' @return A dataframe containing all markers. It will also write a csv file
 #' with the DE genes, a csv file with the hypergeometric test output (if run)
 #' and an excel file with both hypergeometric output and DE genes.
-#' @import tidyverse
-#' @import openxlsx
+#' @importFrom dplyr filter
+#' @importFrom utils write.csv
+#' @importFrom openxlsx createWorkbook addWorksheet writeData saveWorkbook
 #' @export
 
 find_write_markers_orig <- function(seurat_object, save_dir,
@@ -621,33 +627,33 @@ find_write_markers_orig <- function(seurat_object, save_dir,
                                     assay = "RNA", pval = 0.05,
                                     logfc = 0.5, gene_lists = NULL) {
   
-  marker_genes <- FindAllMarkers(seurat_object, assay = seurat_assay,
+  marker_genes <- FindAllMarkers(seurat_object, assay = assay,
                                  only.pos = TRUE)
-  write.csv(marker_genes, file = file.path(save_dir, "files",
+  utils::write.csv(marker_genes, file = file.path(save_dir, "files",
                                         "DE", paste0(assay, "_markers_",
                                         meta_col, ".csv")))
   
   # Create excel wb
-  gene_wb <- createWorkbook()
+  gene_wb <- openxlsx::createWorkbook()
   
   # Write to excel wb
   full_list <- lapply(unique(marker_genes$cluster), function(x){
     x <- as.character(x)
     new_df <- marker_genes %>%
       dplyr::filter(cluster == x & p_val_adj < pval & avg_log2FC > logfc)
-    addWorksheet(gene_wb, x)
-    writeData(gene_wb, x, new_df)
+    openxlsx::addWorksheet(gene_wb, x)
+    openxlsx::writeData(gene_wb, x, new_df)
   })
   
   # Run a hypergeomitric test
   if(!is.null(gene_lists)){
-    hypergeometric <- hypergeometric_test(seurat_object = seurat_data,
+    hypergeometric <- hypergeometric_test(seurat_object = seurat_object,
                                           gene_list = gene_lists,
                                           DE_table = marker_genes,
                                           DE_p_cutoff = 0.05,
                                           DE_lfc_cutoff = 0.5,
                                           correction_method = "fdr")
-    write.csv(hypergeometric, file = file.path(save_dir, "files",
+    utils::write.csv(hypergeometric, file = file.path(save_dir, "files",
                                             "DE", paste0(assay,
                                             "_hypergeometric_",
                                             meta_col, ".csv")))
@@ -658,17 +664,17 @@ find_write_markers_orig <- function(seurat_object, save_dir,
       new_df <- hypergeometric %>%
         dplyr::filter(cluster == x)
       worksheet_name <-  paste0(x, "_gse")
-      addWorksheet(gene_wb, worksheet_name)
-      writeData(gene_wb, worksheet_name, new_df)
+      openxlsx::addWorksheet(gene_wb, worksheet_name)
+      openxlsx::writeData(gene_wb, worksheet_name, new_df)
     })
   }
   
   ## Save workbook to working directory
-  saveWorkbook(gene_wb,
-               file = file.path(save_dir,
-                             "files", "DE", paste0(assay, "_markers_",
-                             meta_col, ".xlsx")),
-               overwrite = TRUE)
+  openxlsx::saveWorkbook(gene_wb,
+                         file = file.path(save_dir,
+                                       "files", "DE", paste0(assay, "_markers_",
+                                       meta_col, ".xlsx")),
+                         overwrite = TRUE)
   
   return(marker_genes)
 }
@@ -689,7 +695,7 @@ find_write_markers_orig <- function(seurat_object, save_dir,
 #' markers. Default is RNA_cluster.
 #' @param assay OPTIONAL the assay to run the differential expression.
 #' Default is RNA.
-#' @param p_val OPTIONAL The cutoff for p value for returned genes.
+#' @param pval OPTIONAL The cutoff for p value for returned genes.
 #' Default is 0.05
 #' @param logfc OPTIONAL The cutoff for the log fold change for returned
 #' genes. Default is 0.5.
@@ -701,8 +707,9 @@ find_write_markers_orig <- function(seurat_object, save_dir,
 #' @return A dataframe containing all markers. It will also write a csv file
 #' with the DE genes, a csv file with the hypergeometric test output (if run)
 #' and an excel file with both hypergeometric output and DE genes.
-#' @import tidyverse
-#' @import openxlsx
+#' @importFrom dplyr filter
+#' @importFrom openxlsx createWorkbook addWorksheet writeData saveWorkbook
+#' @importFrom utils write.csv combn
 #' @export
 
 find_write_markers_pairwise <- function(seurat_object, save_dir,
@@ -710,19 +717,19 @@ find_write_markers_pairwise <- function(seurat_object, save_dir,
                                         assay = "RNA", pval = 0.05,
                                         logfc = 0.5, gene_lists = NULL) {
   
-  marker_genes <- pairwise_markers(seurat_object, assay = seurat_assay,
+  marker_genes <- pairwise_markers(seurat_object, assay = assay,
                                    meta_col = meta_col)
-  write.csv(marker_genes, file = file.path(save_dir, "files",
+  utils::write.csv(marker_genes, file = file.path(save_dir, "files",
                                            "DE", paste0(assay,
                                                         "_pairwise_markers_",
                                                         meta_col, ".csv")))
   
   # Create excel wb
-  gene_wb <- createWorkbook()
+  gene_wb <- openxlsx::createWorkbook()
   
   # Write to excel wb
   values <- unique(c(marker_genes$cluster_down, marker_genes$cluster_up))
-  combinations <- combn(unique(c(marker_genes$cluster_down,
+  combinations <- utils::combn(unique(c(marker_genes$cluster_down,
                                  marker_genes$cluster_up)),
                         m = 2)
   full_list <- lapply(1:ncol(combinations), function(x){
@@ -733,8 +740,8 @@ find_write_markers_pairwise <- function(seurat_object, save_dir,
       dplyr::filter((cluster_up == ident1 & cluster_down == ident2) |
                       (cluster_up == ident2 & cluster_down == ident1)) %>%
       dplyr::filter(p_val_adj < pval & avg_log2FC > logfc)
-    addWorksheet(gene_wb, sheet_name)
-    writeData(gene_wb, sheet_name, new_df)
+    openxlsx::addWorksheet(gene_wb, sheet_name)
+    openxlsx::writeData(gene_wb, sheet_name, new_df)
   })
   
   # Alter so it will work with a hypergeometric test
@@ -743,13 +750,13 @@ find_write_markers_pairwise <- function(seurat_object, save_dir,
   
   # Run a hypergeomitric test
   if(!is.null(gene_lists)){
-    hypergeometric <- hypergeometric_test(seurat_object = seurat_data,
+    hypergeometric <- hypergeometric_test(seurat_object = seurat_object,
                                           gene_list = gene_lists,
                                           DE_table = marker_genes,
                                           DE_p_cutoff = 0.05,
                                           DE_lfc_cutoff = 0.5,
                                           correction_method = "fdr")
-    write.csv(hypergeometric, file = file.path(save_dir, "files",
+    utils::write.csv(hypergeometric, file = file.path(save_dir, "files",
                                                "DE", paste0(assay,
                                                             "_hypergeometric_",
                                                             meta_col, ".csv")))
@@ -760,13 +767,13 @@ find_write_markers_pairwise <- function(seurat_object, save_dir,
       new_df <- hypergeometric %>%
         dplyr::filter(cluster == x)
       worksheet_name <-  paste0(x, "_gse")
-      addWorksheet(gene_wb, worksheet_name)
-      writeData(gene_wb, worksheet_name, new_df)
+      openxlsx::addWorksheet(gene_wb, worksheet_name)
+      openxlsx::writeData(gene_wb, worksheet_name, new_df)
     })
   }
   
   ## Save workbook to working directory
-  saveWorkbook(gene_wb,
+  openxlsx::saveWorkbook(gene_wb,
                file = file.path(save_dir,
                                 "files", "DE",
                                 paste0(assay, "_pairwise_markers_",
@@ -800,7 +807,8 @@ find_write_markers_pairwise <- function(seurat_object, save_dir,
 #' @return A dataframe containing hypergeometric output. Includes the expected number
 #' of genes from each set seen, the enrichment of the gene set, a p-value, and a
 #' corrected p-value for each cluster and each gene set.
-#' @import tidyverse
+#' @importFrom dplyr filter
+#' @importFrom stats p.adjust dhyper
 #' @export
 #' @examples
 #' \dontrun{
@@ -854,7 +862,7 @@ hypergeometric_test <- function(seurat_object, gene_list, DE_table,
       representation <- x/expected_num
       
       # Calculate the p_val
-      p_val <- sum(dhyper(x:k, m, n, k))
+      p_val <- sum(stats::dhyper(x:k, m, n, k))
       
       return_df <- data.frame(cluster = cluster_name,
                               gene_list = list_name,
@@ -876,8 +884,8 @@ hypergeometric_test <- function(seurat_object, gene_list, DE_table,
   full_hypergeometric <- do.call(rbind, hypergeometric_list)
   
   # Calculate adjusted p values
-  full_hypergeometric$p_adj <- p.adjust(full_hypergeometric$p_val,
-                                        method = correction_method)
+  full_hypergeometric$p_adj <- stats::p.adjust(full_hypergeometric$p_val,
+                                               method = correction_method)
   
   return(full_hypergeometric)
 }
@@ -908,7 +916,7 @@ hypergeometric_test <- function(seurat_object, gene_list, DE_table,
 #' the ArchR package.
 #' @param breaks OPTIONAL How to adjust the color scale. Can use if the heatmap looks
 #' washed out. Default is FALSE.
-#' @param mak_val OPTIONAL where to cutoff the color scale. Default is no cutoff.
+#' @param max_val OPTIONAL where to cutoff the color scale. Default is no cutoff.
 #' @param row_order OPTIONAL if you want the rows in a certain order, this vector
 #' must match the names in "gene_list" from the hypergeometric output. This overrides
 #' any row clustering. Default is to not order the rows
@@ -917,9 +925,9 @@ hypergeometric_test <- function(seurat_object, gene_list, DE_table,
 #' on a mix of columns from the metadata, but want to color each column separately.
 #' @param ... other arguements passed to pheatmap
 #' @return A pheatmap object
-#' @import tidyverse
 #' @import RColorBrewer
-#' @import pheatmap
+#' @importFrom stats quantile
+#' @importFrom pheatmap pheatmap
 #' @export
 #' @examples
 #' \dontrun{
@@ -961,7 +969,8 @@ plot_hypergeom <- function(hypergeom_output, colors = NULL, meta_df = NULL,
       sample_info$cluster <- factor(sample_info$cluster)
     }
     if(is.null(colors)){
-      colors <- brewer.pal(length(levels(sample_info$cluster)), "Set1")
+      colorcount <- length(levels(sample_info$cluster))
+      colors <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(9, "Set1"))(colorcount)
       names(colors) <- levels(sample_info$cluster)
     } 
     # make a list for the column labeing
@@ -1002,7 +1011,7 @@ plot_hypergeom <- function(hypergeom_output, colors = NULL, meta_df = NULL,
 
   if((breaks)){
     quantile_breaks <- function(xs, n = 30) {
-      breaks <- quantile(xs, probs = seq(0, 1, length.out = n))
+      breaks <- stats::quantile(xs, probs = seq(0, 1, length.out = n))
       breaks[!duplicated(breaks)]
     }
     

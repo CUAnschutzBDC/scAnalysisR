@@ -37,14 +37,14 @@ meta data column.}
 colnames(object[[]])) used for coloring the desired group. For example, if you want to
 only highlight one cluster, meta_data_col = "cluster".}
 
+\item{assay}{OPTIONAL The assay to use to color the plot. This is mostly useful if
+you have the same names in your ADT and RNA slots so you can ensure you plot the
+correct one.}
+
 \item{...}{OPTIONAL arguments supplied to groupDiscretePlots, groupContinuousPlots,
 discretePlots, or continuousPlots}
 
 \item{sample_object}{A seurat object}
-
-\item{assasy}{OPTIONAL The assay to use to color the plot. This is mostly useful if
-you have the same names in your ADT and RNA slots so you can ensure you plot the
-correct one.}
 }
 \description{
 This function is meant to be called by plotDimRed and not used on it's own!!!

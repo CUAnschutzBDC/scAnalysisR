@@ -35,7 +35,6 @@ confusionMatrix <- function(i = NULL, j = NULL){
 #' mouse genes to human
 #' @return a dataframe containing both human and mouse genes for the 
 #' input vector
-#' @import biomaRt
 #' @export
 #' @examples
 #' \dontrun{
@@ -49,9 +48,13 @@ confusionMatrix <- function(i = NULL, j = NULL){
 
 convertHumanGeneList <- function(x, convert = "human_mouse"){
   
-  require("biomaRt")
-  human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-  mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+   if (!requireNamespace("biomaRt", quietly = TRUE)){
+    stop("Package \"biomaRt\" needed for this function to work. Please install it.",
+      call. = FALSE)
+  }
+
+  human = biomaRt::useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+  mouse = biomaRt::useMart("ensembl", dataset = "mmusculus_gene_ensembl")
   if(convert == "human_mouse"){
     to_symbol = "mgi_symbol"
     from_symbol = "hgnc_symbol"
@@ -64,7 +67,7 @@ convertHumanGeneList <- function(x, convert = "human_mouse"){
     from_mart = mouse
   }
   
-  genesV2 = getLDS(attributes = c(from_symbol), filters = from_symbol,
+  genesV2 = biomaRt::getLDS(attributes = c(from_symbol), filters = from_symbol,
                    values = x , mart = from_mart, attributesL = c(to_symbol),
                    martL = to_mart, uniqueRows=T)
   

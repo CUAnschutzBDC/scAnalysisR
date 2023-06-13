@@ -59,6 +59,10 @@ returned as a list. Default (TRUE) returns a figure.}
 
 \item{width}{OPTIONAL how to adjust how wide the violin plots are. Default is 0.9}
 
+\item{assay}{OPTIONAL The assay to use to color the plot. This is mostly useful if
+you have the same names in your ADT and RNA slots so you can ensure you plot the
+correct one.}
+
 \item{...}{arguments passed to other functions}
 }
 \value{

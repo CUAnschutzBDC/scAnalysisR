@@ -14,6 +14,10 @@ plotDF(seurat_object, y_val, x_val, col_by = NULL, assay = NULL)
 \item{x_val}{What to use to separate along the x-axis}
 
 \item{col_by}{OPTIONAL what to use to color the cells (or violins).}
+
+\item{assay}{OPTIONAL The assay to use to color the plot. This is mostly useful if
+you have the same names in your ADT and RNA slots so you can ensure you plot the
+correct one.}
 }
 \description{
 This function is meant to be called by featDistPlot and not used on it's own!!!
