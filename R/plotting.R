@@ -1013,19 +1013,19 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
   if(!is.null(cell_order)){
     sample_info <- sample_info[order(match(rownames(sample_info),
                                            cell_order)), , drop = FALSE]
-    rownames(sample_info) <- sub("-", ".", rownames(sample_info))
+    rownames(sample_info) <- make.names(rownames(sample_info))
     if (!identical(colnames(heatmap_scale), rownames(sample_info))) {
       heatmap_scale <- heatmap_scale[, rownames(sample_info)]
     }
   } else if (!cluster_cols) {
     sample_info <- sample_info[order(match(sample_info[[meta_col]], 
                                            cluster_order)), , drop = FALSE]
-    rownames(sample_info) <- sub("-", ".", rownames(sample_info))
+    rownames(sample_info) <- make.names(rownames(sample_info))
     if (!identical(colnames(heatmap_scale), rownames(sample_info))) {
       heatmap_scale <- heatmap_scale[, rownames(sample_info)]
     }
   } else {
-    rownames(sample_info) <- sub("-", ".", rownames(sample_info))
+    rownames(sample_info) <- make.names(rownames(sample_info))
   }
   
   if(!plot_meta_col){
