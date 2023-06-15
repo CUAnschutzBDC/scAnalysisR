@@ -49,7 +49,7 @@ create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
                              "per_sample_outs", sample, "count",
                              "sample_filtered_feature_bc_matrix")
   } else if (tenx_structure == "none"){
-    sample_path <- file.path(count_path, sample)
+    sample_path <- file.path(count_path)
   } else {
     stop("tenx_structure must be 'multi', 'count', 'multi7', or 'none'")
   }
