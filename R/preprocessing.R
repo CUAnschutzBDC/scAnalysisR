@@ -120,11 +120,10 @@ create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
 #' given or based on the rules described above.
 #' @export
 #' @examples
-#' \dontrun{
-#' seurat_object <- PCA_dimRed(sample_object = seurat_object)
-#' seurat_object <- PCA_dimRed(sample_object = seurat_object,
-#'                             assay         = "SCT")
-#' }
+#' splen_so <- PCA_dimRed(sample_object = splen_so)
+#' splen_so <- SCTransform(splen_so, verbose = FALSE)
+#' splen_so <- PCA_dimRed(sample_object = splen_so,
+#'                        assay         = "SCT")
 
 PCA_dimRed <- function(sample_object, assay = "RNA",
                        reduction_name = NULL, vars_to_regress = NULL){
@@ -155,11 +154,20 @@ PCA_dimRed <- function(sample_object, assay = "RNA",
                                     features =
                                       VariableFeatures(
                                         object = sample_object),
-                                    reduction.name = "sctpca")
+                                    reduction.name = reduction_name)
   } else if(assay == "integrated"){
     DefaultAssay(sample_object) = "integrated"
     sample_object <- RunPCA(sample_object,
                             features = VariableFeatures(object = sample_object))
+  } else {
+    if(is.null(reduction_name)){
+      stop(paste0("If assay isn't 'RNA', 'ADT', 'SCT', or 'integrated', a ",
+                  "'reduction_name' must be provided!"))
+    }
+    DefaultAssay(sample_object) = assay
+    sample_object <- RunPCA(sample_object,
+                            features = VariableFeatures(object = sample_object),
+                            reduction.name = reduction_name)
   }
   return(sample_object)
 }
