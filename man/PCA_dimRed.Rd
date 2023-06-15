@@ -35,9 +35,8 @@ name for RNA, SCT, ADT, or integrated assays. There is currently no functionalit
 included for other assays.
 }
 \examples{
-\dontrun{
-seurat_object <- PCA_dimRed(sample_object = seurat_object)
-seurat_object <- PCA_dimRed(sample_object = seurat_object,
-                            assay         = "SCT")
-}
+splen_so <- PCA_dimRed(sample_object = splen_so)
+splen_so <- SCTransform(splen_so, verbose = FALSE)
+splen_so <- PCA_dimRed(sample_object = splen_so,
+                       assay         = "SCT")
 }
