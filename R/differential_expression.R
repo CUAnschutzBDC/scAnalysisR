@@ -621,7 +621,7 @@ find_write_markers_orig <- function(seurat_object, save_dir,
                                     assay = "RNA", pval = 0.05,
                                     logfc = 0.5, gene_lists = NULL) {
   
-  marker_genes <- FindAllMarkers(seurat_object, assay = seurat_assay,
+  marker_genes <- FindAllMarkers(seurat_object, assay = assay,
                                  only.pos = TRUE)
   write.csv(marker_genes, file = file.path(save_dir, "files",
                                         "DE", paste0(assay, "_markers_",
@@ -710,7 +710,7 @@ find_write_markers_pairwise <- function(seurat_object, save_dir,
                                         assay = "RNA", pval = 0.05,
                                         logfc = 0.5, gene_lists = NULL) {
   
-  marker_genes <- pairwise_markers(seurat_object, assay = seurat_assay,
+  marker_genes <- pairwise_markers(seurat_object, assay = assay,
                                    meta_col = meta_col)
   write.csv(marker_genes, file = file.path(save_dir, "files",
                                            "DE", paste0(assay,
