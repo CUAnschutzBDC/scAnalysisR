@@ -15,7 +15,6 @@ Imports: Seurat,
     stringr,
     RColorBrewer,
     openxlsx,
-    biomaRt,
     Matrix,
     pheatmap,
     gridExtra,
@@ -24,7 +23,10 @@ Imports: Seurat,
 Suggests:
     clustifyr,
     pathview,
-    ggrastr
+    ggrastr,
+    biomaRt
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+LazyData: true
+

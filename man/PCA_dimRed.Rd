@@ -36,7 +36,9 @@ included for other assays.
 }
 \examples{
 splen_so <- PCA_dimRed(sample_object = splen_so)
+\dontrun{
 splen_so <- SCTransform(splen_so, verbose = FALSE)
 splen_so <- PCA_dimRed(sample_object = splen_so,
-                       assay         = "SCT")
+                       assay = "SCT")
+}
 }

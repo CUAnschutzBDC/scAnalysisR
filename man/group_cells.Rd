@@ -56,10 +56,8 @@ by the reduction you started with.
 This function will run both UMAP and clustering on a seurat object.
 }
 \examples{
-\dontrun{
-seurat_object <- group_cells(sample_object = seurat_object)
-seurat_object <- group_cells(sample_object = seurat_object,
-                             nPCs          = 25,
-                             reduction     = 1.2)
-}
+umap_res <- group_cells(sample_object = splen_so)
+umap_res <- group_cells(sample_object = splen_so,
+                             nPCs = 25,
+                             resolution = 1.2)
 }

@@ -1,11 +1,11 @@
 #' Creates a seurat object
-#' 
+#'
 #' This function will create a seurat object. It assumes that the 10x output files are
 #' in a directory named by the sample name followe by outs/count/filtered_feature_bc_matrix
 #' This function can also generate matricies for HTO and ADTs. This function will also
 #' perform CLR normlization on the ADT and HTO matricies, but will not normalize the
 #' RNA data.
-#' @param sample The name of the sample (also the name of the directory containing the 
+#' @param sample The name of the sample (also the name of the directory containing the
 #' count matricies).
 #' @param count_path The full path to the 10x output files. In total this will be
 #' count_path/sample/outs/count/filtered_feature_bc_matrix
@@ -13,15 +13,15 @@
 #' @param hashtag OPTIONAL If HTOs were included in the experiment. Default is TRUE
 #' @param min_features OPTIONAL How many features per cell are necessary to keep the cell
 #' will be passed to CreateSeuratObject. Default is 200
-#' @param min_cells OPTIONAL the number of cells required to keep a feature, will be 
+#' @param min_cells OPTIONAL the number of cells required to keep a feature, will be
 #' passed to CreateseuratObject. Default is 3.
 #' @param hashtag_idents OPTIONAL the identities of the hashtags. If provided must be
-#' exactly the identity that would be in the rowname. Default is to search for the 
+#' exactly the identity that would be in the rowname. Default is to search for the
 #' word "Hashtag" in the identity.
 #' @param tenx_structure OPTIONAL if the file structure is from 10x multi (sample/outs/count),
 #' 10x count (sample/outs/) 10x multi 7 (sample/outs/per_sample_outs/sample/count) or neither
 #' (sample). Options are "multi" (default), "count", "multi7", or "none"
-#' @return A seurat object with assays for HTO and ADT (if HTO and ADT are true). 
+#' @return A seurat object with assays for HTO and ADT (if HTO and ADT are true).
 #' If HTO and ADTs are included, those matricies will be normalized by CLR normalization
 #' @import Seurat
 #' @export
@@ -65,7 +65,7 @@ create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
   sample_data <- Read10X(data.dir = sample_path)
   if (ADT | hashtag){
     sample_object <- CreateSeuratObject(counts = sample_data[["Gene Expression"]],
-                                        project = sample, min.cells = min_cells, 
+                                        project = sample, min.cells = min_cells,
                                         min.features = min_features)
     if (hashtag){
       protein_data <- sample_data[["Antibody Capture"]]
@@ -103,7 +103,7 @@ create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
 }
 
 #' Performs PCA dimensionality reduction
-#' 
+#'
 #' This function will perform PCA dimensionality reduction and create a reduction
 #' name for RNA, SCT, ADT, or integrated assays. There is currently no functionality
 #' included for other assays.
@@ -122,9 +122,11 @@ create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
 #' @export
 #' @examples
 #' splen_so <- PCA_dimRed(sample_object = splen_so)
+#' \dontrun{
 #' splen_so <- SCTransform(splen_so, verbose = FALSE)
 #' splen_so <- PCA_dimRed(sample_object = splen_so,
-#'                        assay         = "SCT")
+#'                        assay = "SCT")
+#' }
 
 PCA_dimRed <- function(sample_object, assay = "RNA",
                        reduction_name = NULL, vars_to_regress = NULL){
@@ -144,7 +146,7 @@ PCA_dimRed <- function(sample_object, assay = "RNA",
     # Use all ADTS for dimensional reduction
     VariableFeatures(sample_object) <- rownames(sample_object[["ADT"]])
     sample_object <- Seurat::ScaleData(sample_object,
-                                       vars.to.regress = vars_to_regress) %>% 
+                                       vars.to.regress = vars_to_regress) %>%
       Seurat::RunPCA(reduction.name = "apca")
   } else if(assay == "SCT"){
     if(is.null(reduction_name)){
@@ -174,7 +176,7 @@ PCA_dimRed <- function(sample_object, assay = "RNA",
 }
 
 #' Make quality plots based on PCA
-#' 
+#'
 #' This function will create quality plots based on the PCA, including PC loadings,
 #' the PCA colored by quality metrics, a knee plot, and a jackstraw plot.
 #' @param sample_object A seurat object
@@ -199,8 +201,10 @@ PCA_dimRed <- function(sample_object, assay = "RNA",
 #' @import Seurat
 #' @export
 #' @examples
+#' splen_so[["percent.mt"]] <- Seurat::PercentageFeatureSet(splen_so,
+#'                                                  pattern = "^mt-")
+#' plot_list <- plot_PCA(sample_object = splen_so)
 #' \dontrun{
-#' plot_list <- plot_PCA(sample_object = seurat_object)
 #' plot_list <- plot_PCA(sample_object = seurat_object,
 #'                       HTO           = TRUE,
 #'                       ADT           = TRUE)
@@ -247,7 +251,7 @@ plot_PCA <- function(sample_object, HTO = FALSE, ADT = FALSE,
     } else {
       plot_list <- c("orig.ident", "percent.mt",
                      "nFeature_Spatial",
-                     "nCount_Spatial")   
+                     "nCount_Spatial")
     }
   }
   plots <- list()
@@ -255,11 +259,11 @@ plot_PCA <- function(sample_object, HTO = FALSE, ADT = FALSE,
                                        reduction = reduction)
   feature_plots <- plotDimRed(sample_object, plot_type = reduction,
                               col_by = plot_list)
-  
+
   names(feature_plots) <- plot_list
-  
+
   plots <- c(plots, feature_plots)
-  
+
   if(assay == "RNA" && jackstraw){
     sample_object <- JackStraw(sample_object, num.replicate = 100,
                                reduction = reduction)
@@ -271,7 +275,7 @@ plot_PCA <- function(sample_object, HTO = FALSE, ADT = FALSE,
 }
 
 #' Run UMAP and clustering
-#' 
+#'
 #' This function will run both UMAP and clustering on a seurat object.
 #' @param sample_object A seurat object
 #' @param sample_name The name of the sample. This will be used for naming output
@@ -286,7 +290,7 @@ plot_PCA <- function(sample_object, HTO = FALSE, ADT = FALSE,
 #' find the resolution appropriate to your dataset. Default is 0.8.
 #' @param assay OPTIONAL What assay to use. This is used to locate the PCA reduction
 #' (the reduction name provided assumes that no reduction name was supplied to PCA_dimRed,
-#' if you did provide a different reduction name, you must use "reduction" below). 
+#' if you did provide a different reduction name, you must use "reduction" below).
 #' This is also used to name the output plots, reductions, and clusters. Can be "RNA",
 #' "ADT", "SCT", or "integrated" Default is "RNA".
 #' @param HTO OPTIONAL if HTOs were included in the seurat object. Default is FALSE
@@ -294,18 +298,16 @@ plot_PCA <- function(sample_object, HTO = FALSE, ADT = FALSE,
 #' the default reduction names in PCA_dimRed. Default is NULL
 #' @param ... other arguments passed to plotDimRed
 #' @return A seurat object with new cluster information in the metadata (RNA_cluster
-#' if assay = "RNA", SCT_cluster if assay = "SCT", integrated_cluster if assay = 
+#' if assay = "RNA", SCT_cluster if assay = "SCT", integrated_cluster if assay =
 #' "integrated", and ADT_cluster if assay = "ADT"), and a new UMAP reduction named
 #' by the reduction you started with.
 #' @import Seurat
 #' @export
 #' @examples
-#' \dontrun{
-#' seurat_object <- group_cells(sample_object = seurat_object)
-#' seurat_object <- group_cells(sample_object = seurat_object,
-#'                              nPCs          = 25,
-#'                              reduction     = 1.2)
-#' }
+#' umap_res <- group_cells(sample_object = splen_so)
+#' umap_res <- group_cells(sample_object = splen_so,
+#'                              nPCs = 25,
+#'                              resolution = 1.2)
 
 group_cells <- function(sample_object, sample_name = NULL, save_dir = NULL,
                         nPCs = 10, resolution = 0.8, assay = "RNA",
@@ -433,13 +435,13 @@ group_cells <- function(sample_object, sample_name = NULL, save_dir = NULL,
                             col_by = col_by_list,
                             plot_type = "integrated.umap", ...)
   }
-  
+
   return(list(object = sample_object,
               plots = plot_list))
 }
 
 #' Creates a spatial seurat object
-#' 
+#'
 #' This function will create a seurat object. It needs the path to the directory
 #' containing output from cellranger count that also includes the images.
 #' @param results_dir The path to the results directory. The structure should be
@@ -448,7 +450,7 @@ group_cells <- function(sample_object, sample_name = NULL, save_dir = NULL,
 #' path should be results_dir/sample_name/outs
 #' @param filter_matrix OPTIONAL If the matrix should be filtered to only include
 #' spots determined to be over tissue. Used by Read10X_Image.
-#' @param filename OPTIONAL The name of the h5 file to load. Default is 
+#' @param filename OPTIONAL The name of the h5 file to load. Default is
 #' filtered_feature_bc_matrix.h5 which should generally work.
 #' @return A seurat object with image data loaded.
 #' @import Seurat

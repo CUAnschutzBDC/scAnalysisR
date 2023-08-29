@@ -50,8 +50,10 @@ This function will create quality plots based on the PCA, including PC loadings,
 the PCA colored by quality metrics, a knee plot, and a jackstraw plot.
 }
 \examples{
+splen_so[["percent.mt"]] <- Seurat::PercentageFeatureSet(splen_so,
+                                                 pattern = "^mt-")
+plot_list <- plot_PCA(sample_object = splen_so)
 \dontrun{
-plot_list <- plot_PCA(sample_object = seurat_object)
 plot_list <- plot_PCA(sample_object = seurat_object,
                       HTO           = TRUE,
                       ADT           = TRUE)
