@@ -429,6 +429,34 @@ group_cells <- function(sample_object, sample_name = NULL, save_dir = NULL,
                             save_plot = save_plot,
                             col_by = col_by_list,
                             plot_type = "integrated.umap", ...)
+  } else {
+    key <- reduction
+
+    DefaultAssay(sample_object) = assay
+    if(!is.null(save_dir)){
+      save_plot <- file.path(save_dir, "images",
+                             paste0(assay, "UMAP_", sample_name, ".pdf"))
+    }
+    sample_object <- FindNeighbors(sample_object, dims = 1:nPCs,
+                                   reduction = reduction)
+    sample_object <- FindClusters(sample_object, resolution = resolution)
+    sample_object <- RunUMAP(sample_object,
+                             metric = "correlation", dims = 1:nPCs,
+                             reduction = reduction, assay = assay,
+                             reduction.key = paste0(key, "UMAP_"),
+                             reduction.name = paste0(key, ".umap"))
+    sample_object[[paste0(assay, "_cluster")]] <- Idents(sample_object)
+    col_by_list <- c(paste0(assay, "_cluster"), "orig.ident")
+    if(HTO){
+      col_by_list <- c(col_by_list, "HTO_classification")
+    }
+    if(is.null(save_dir)){
+      save_plot <- NULL
+    }
+    plot_list <- plotDimRed(sample_object = sample_object,
+                            save_plot = save_plot,
+                            col_by = col_by_list,
+                            plot_type = paste0(key, ".umap"), ...)
   }
   
   return(list(object = sample_object,
