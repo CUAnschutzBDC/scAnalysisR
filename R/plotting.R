@@ -948,7 +948,7 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
     Idents(seurat_object) <- meta_col
     heatmap_df <- AverageExpression(seurat_object, seurat = FALSE,
                                     group.by = meta_col, assays = assay)
-    heatmap_df <- heatmap_df$RNA
+    heatmap_df <- heatmap_df[[assay]]
     # Test if the colnames look like integers
     character_vals <- 
       suppressWarnings(all(!is.na(as.numeric(as.character(colnames(heatmap_df))))))
