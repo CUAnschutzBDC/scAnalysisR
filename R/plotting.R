@@ -912,6 +912,7 @@ plotDF <- function(seurat_object, y_val, x_val,
 #' @param return_data OPTIONAL If the scaled matrix and count matrix should be returned.
 #' if TRUE, a list will be returned with the heatmap and both matricies, if FALSE only
 #' the heatmap will be returned. Default is FALSE
+#' @param assay OPTIONAL what assay should be used for generating the plot
 #' @param ... Other options passed to `pheatmap`
 #' @return A pheatmap object with x axis colors based on the meta data column provided
 #' or your own meta_df with color_list.
@@ -940,12 +941,13 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
                          max_val = 2.5, min_val = -2.5, cluster_rows = FALSE,
                          cluster_cols = FALSE, average_expression = FALSE,
                          plot_meta_col = TRUE, plot_rownames = TRUE,
-                         cell_order = NULL, return_data = FALSE, ...){
+                         cell_order = NULL, return_data = FALSE,
+                         assay = "RNA", ...){
   if(average_expression){
     # Find average expression of genes in clusters
     Idents(seurat_object) <- meta_col
     heatmap_df <- AverageExpression(seurat_object, seurat = FALSE,
-                                    group.by = meta_col)
+                                    group.by = meta_col, assays = assay)
     heatmap_df <- heatmap_df$RNA
     # Test if the colnames look like integers
     character_vals <- 
@@ -973,7 +975,7 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
     }
   } else {
     # Pull out data and subset to genes of interest
-    heatmap_df <- GetAssayData(seurat_object, slot = "data")
+    heatmap_df <- GetAssayData(seurat_object, slot = "data", assay = assay)
   }
   heatmap_df <- heatmap_df[rownames(heatmap_df) %in% gene_list, ]
   heatmap_df <- data.frame(heatmap_df)

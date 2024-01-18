@@ -20,6 +20,7 @@ plot_heatmap(
   plot_rownames = TRUE,
   cell_order = NULL,
   return_data = FALSE,
+  assay = "RNA",
   ...
 )
 }
@@ -63,6 +64,8 @@ can be a bit buggy, I'm still working on making it work more robustly.}
 \item{return_data}{OPTIONAL If the scaled matrix and count matrix should be returned.
 if TRUE, a list will be returned with the heatmap and both matricies, if FALSE only
 the heatmap will be returned. Default is FALSE}
+
+\item{assay}{OPTIONAL what assay should be used for generating the plot}
 
 \item{...}{Other options passed to \code{pheatmap}}
 
