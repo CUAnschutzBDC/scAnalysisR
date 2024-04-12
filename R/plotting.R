@@ -26,6 +26,8 @@
 #' only highlight one cluster, meta_data_col = "cluster".
 #' @param group The group to color. This group must be present in the selected meta data 
 #' column.
+#' @param reorder_cells OPTIONAL If cells should be randomly reodered to improve plotting 
+#' aesthetics. Can be helpful if you don't want samples plotted in order. Default is FALSE.
 #' @param ... OPTIONAL arguments supplied to plotDimRedSingle
 #' @return a list of plots colored by the given parameteres
 #' @import tidyverse
@@ -50,7 +52,7 @@ plotDimRed <- function(sample_object, col_by, save_plot = NULL,
                        plot_type = "umap",
                        dims_use = NULL, highlight_group = FALSE,
                        group = NULL,
-                       meta_data_col = "orig.ident", ...) {
+                       meta_data_col = "orig.ident", reorder_cells = FALSE, ...) {
   plot_list <- lapply(col_by, function(x) {
     plotDimRedSingle(seurat_object = sample_object, col_by = x, plot_type = plot_type,
                      dims_use = dims_use, highlight_group = highlight_group,
@@ -89,6 +91,8 @@ plotDimRed <- function(sample_object, col_by, save_plot = NULL,
 #' @param assasy OPTIONAL The assay to use to color the plot. This is mostly useful if
 #' you have the same names in your ADT and RNA slots so you can ensure you plot the
 #' correct one.
+#' @param reorder_cells OPTIONAL If cells should be randomly reodered to improve plotting 
+#' aesthetics. Can be helpful if you don't want samples plotted in order. Default is FALSE.
 #' @param ... OPTIONAL arguments supplied to groupDiscretePlots, groupContinuousPlots,
 #' discretePlots, or continuousPlots
 #' @keywords internal
@@ -100,7 +104,7 @@ plotDimRed <- function(sample_object, col_by, save_plot = NULL,
 plotDimRedSingle <- function(seurat_object, col_by, plot_type = "umap",
                              dims_use = NULL, highlight_group = FALSE,
                              group = NULL, meta_data_col = "orig.ident",
-                             assay = NULL, ...) {
+                             assay = NULL, reorder_cells = FALSE, ...) {
   # Determine where in Seurat object to find variable to color by
   if (!is.null(assay) && col_by %in% rownames(seurat_object[[assay]])){
     DefaultAssay(seurat_object) <- assay
@@ -166,6 +170,12 @@ plotDimRedSingle <- function(seurat_object, col_by, plot_type = "umap",
                             levels = c("all_samples", levels(plot_df$all)))
     }
     plot_df$all[!(plot_df$all %in% group)] <- "all_samples"
+
+    # Randomly order the cells to change plotting order. Can be helpful if you don't
+    # want samples plotted in order
+    if(reorder_cells){
+      plot_df <- plot_df[sample(nrow(plot_df)),]
+    }
     
     # Plot as discrete
     if (!is.numeric(plot_df$colour_metric)){

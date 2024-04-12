@@ -13,6 +13,7 @@ plotDimRedSingle(
   group = NULL,
   meta_data_col = "orig.ident",
   assay = NULL,
+  reorder_cells = FALSE,
   ...
 )
 }
@@ -36,6 +37,9 @@ meta data column.}
 \item{meta_data_col}{The column in the seurat metadata (options can be found by calling
 colnames(object[[]])) used for coloring the desired group. For example, if you want to
 only highlight one cluster, meta_data_col = "cluster".}
+
+\item{reorder_cells}{OPTIONAL If cells should be randomly reodered to improve plotting
+aesthetics. Can be helpful if you don't want samples plotted in order. Default is FALSE.}
 
 \item{...}{OPTIONAL arguments supplied to groupDiscretePlots, groupContinuousPlots,
 discretePlots, or continuousPlots}
