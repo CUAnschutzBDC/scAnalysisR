@@ -187,6 +187,10 @@ plotDimRedSingle <- function(seurat_object, col_by, plot_type = "umap",
                                           col_by = col_by, ...)
     }
   } else {
+    # Reorder cells if necessary
+    if(reorder_cells){
+      plot_df <- plot_df[sample(nrow(plot_df)),]
+    }
     # Plot as discrete
     if (!is.numeric(plot_df$colour_metric)){
       return_plot <- discretePlots(plot_df, axis_names = axis_names,
