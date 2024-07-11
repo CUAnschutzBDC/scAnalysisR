@@ -1,4 +1,7 @@
 # scAnalysisR 
+Please cite using the zenodo [DOI: 10.5281/zenodo.12726713](https://doi.org/10.5281/zenodo.12726713)
+
+
 A package to perform single cell analysis using various tools. The package centers around using `Seurat` objects and has functions for preprocessing, plotting, running differential expression and gene ontology, and naming popultions.
 
 This package works with `Seurat` version 3 objects.
