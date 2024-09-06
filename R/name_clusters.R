@@ -34,7 +34,9 @@
 #' specifically want to exclude features (for example Ig genes or TCR genes).
 #' @return a list containing the correlation matricies and the seurat object with a new
 #' meta data column including the identified cell type.
-#' @import tidyverse
+#' @import pheatmap
+#' @import dplyr
+#' @importFrom viridis viridis
 #' @export
 #' @examples
 #' \dontrun{
@@ -52,12 +54,12 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
                           plot_type = "rna.umap",
                           cor_cutoff = 0.5,
                           features = NULL){
+  # Work around for "no visible binding"
+  r <- type <- NULL
   
   # Ask user to install clustifyr to use this function
-  if (!requireNamespace("clustifyr", quietly = TRUE)){
-    stop("Package \"clustifyr\" needed for this function to work. Please install it.",
-      call. = FALSE)
-  }
+  check_packages("clustifyr")
+  requireNamespace("clustifyr")
 
 
   # Make directories if they don't exist
@@ -77,7 +79,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
   ##########
   # get count matrix
   DefaultAssay(seurat_object) <- assay
-  seurat_mat <- GetAssayData(object = seurat_object, slot = "data")
+  seurat_mat <- get_seurat_assay(object = seurat_object, type = "data", assay = assay)
   
   if(is.null(features)){
     # Find only the specified number of variable features
@@ -102,7 +104,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
   seurat_object[[clusters]] <- seurat_metadata[[clusters]]
   
   # Run clustify
-  seurat_res <- clustify(
+  seurat_res <- clustifyr::clustify(
     input = seurat_mat,
     metadata = seurat_metadata,
     ref_mat = ref_mat,
@@ -112,10 +114,10 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
   
   return_list$RNA <- seurat_res
   
-  pheatmap::pheatmap(seurat_res, color = viridisLite::viridis(10))
+  pheatmap::pheatmap(seurat_res, color = viridis::viridis(10))
   
-  seurat_cluster <- cor_to_call(seurat_res) %>%
-    mutate(type = ifelse(r < cor_cutoff, "undetermined", type))
+  seurat_cluster <- clustifyr::cor_to_call(seurat_res) %>%
+    dplyr::mutate(type = ifelse(r < cor_cutoff, "undetermined", type))
   new_clusters <- seurat_cluster$type
   names(new_clusters) <- seurat_cluster$cluster
   
@@ -150,7 +152,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     seurat_object[[clusters]] <- seurat_metadata[[clusters]]
     
     # Run clustify
-    seurat_res <- clustify(
+    seurat_res <- clustifyr::clustify(
       input = seurat_mat,
       metadata = seurat_metadata,
       ref_mat = ref_mat,
@@ -160,7 +162,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     
     return_list$ADT <- seurat_res
     
-    seurat_cluster <- cor_to_call(seurat_res) %>%
+    seurat_cluster <- clustifyr::cor_to_call(seurat_res) %>%
       mutate(type = ifelse(r < cor_cutoff, "undetermined", type))
     new_clusters <- seurat_cluster$type
     names(new_clusters) <- seurat_cluster$cluster
@@ -192,7 +194,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     seurat_object[[clusters]] <- seurat_metadata[[clusters]]
     
     # Run clustify
-    seurat_res <- clustify(
+    seurat_res <- clustifyr::clustify(
       input = seurat_mat,
       metadata = seurat_metadata,
       ref_mat = ref_mat,
@@ -202,7 +204,7 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     
     return_list$WNN <- seurat_res
     
-    seurat_cluster <- cor_to_call(seurat_res) %>%
+    seurat_cluster <- clustifyr::cor_to_call(seurat_res) %>%
       mutate(type = ifelse(r < cor_cutoff, "undetermined", type))
     new_clusters <- seurat_cluster$type
     names(new_clusters) <- seurat_cluster$cluster

@@ -59,6 +59,8 @@ returned as a list. Default (TRUE) returns a figure.}
 
 \item{width}{OPTIONAL how to adjust how wide the violin plots are. Default is 0.9}
 
+\item{assay}{OPTIONAL what assay to pull the data from. Default is NULL.}
+
 \item{...}{arguments passed to other functions}
 }
 \value{

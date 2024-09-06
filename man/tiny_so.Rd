@@ -8,7 +8,7 @@
 A Seurat object with 200 features, 200 cells, and 1 assay
 }
 \usage{
-tiny_so
+data(tiny_so)
 }
 \description{
 A tiny Seurat object

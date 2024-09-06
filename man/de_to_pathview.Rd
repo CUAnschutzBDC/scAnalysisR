@@ -31,10 +31,10 @@ it "pathview"}
 \item{pval}{OPTIONAL the pvalue cutoff for the adjusted pvalue from the DE
 test. Default is 0.05.}
 
-\item{...}{OPTIONAL arguments supplied to find_markers}
+\item{gen_id}{OPTIONAL the identifier for the organism. "hsa" for human
+"mmu" for mouse. Default is mmu.}
 
-\item{seurat_assay}{OPTIONAL which assay to pull the data from when
-performing DE. Default is "RNA"}
+\item{...}{OPTIONAL arguments supplied to find_markers}
 }
 \value{
 Nothing is returned, instead pathview plots are made and saved in

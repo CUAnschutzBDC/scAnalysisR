@@ -120,8 +120,9 @@ create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
 #' given or based on the rules described above.
 #' @export
 #' @examples
+#' data(splen_so)
 #' splen_so <- PCA_dimRed(sample_object = splen_so)
-#' splen_so <- SCTransform(splen_so, verbose = FALSE)
+#' splen_so <- Seurat::SCTransform(splen_so, verbose = FALSE)
 #' splen_so <- PCA_dimRed(sample_object = splen_so,
 #'                        assay         = "SCT")
 

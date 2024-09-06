@@ -50,6 +50,8 @@ the ArchR package.}
 \item{breaks}{OPTIONAL How to adjust the color scale. Can use if the heatmap looks
 washed out. Default is FALSE.}
 
+\item{max_val}{OPTIONAL where to cutoff the color scale. Default is no cutoff.}
+
 \item{row_order}{OPTIONAL if you want the rows in a certain order, this vector
 must match the names in "gene_list" from the hypergeometric output. This overrides
 any row clustering. Default is to not order the rows}
@@ -59,8 +61,6 @@ The default is to plot these. This is mostly helpful if you are plotting based
 on a mix of columns from the metadata, but want to color each column separately.}
 
 \item{...}{other arguements passed to pheatmap}
-
-\item{mak_val}{OPTIONAL where to cutoff the color scale. Default is no cutoff.}
 }
 \value{
 A pheatmap object

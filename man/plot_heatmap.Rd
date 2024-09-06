@@ -57,9 +57,21 @@ variable genes don't completely controll the color scale. Default is -2.5}
 
 \item{cluster_rows}{OPTIONAL if rows should be clustered. Default is FALSE}
 
+\item{cluster_cols}{OPTIONAL if columns should be clustered. Default is FALSE}
+
 \item{average_expression}{OPTIONAL if the average expression of clusters should be
 computed before making the heatmap. This option makes much prettier plots, but
 can be a bit buggy, I'm still working on making it work more robustly.}
+
+\item{plot_meta_col}{OPTIONAL If the \code{meta_col} should be included in the coloring on the top
+of the plot. I generally turn this off if I am plotting many features on the top and
+have a custum meta_df. Default is TRUE}
+
+\item{plot_rownames}{OPTIONAL if rownames should be printed. Default is TRUE. I generally
+like to print the rownames unless there are too many to be visually pleasing.}
+
+\item{cell_order}{OPTIONAL a custom order of the cells to plot. Default is NULL
+and cells will be plotted in the order of the object or by clustering.}
 
 \item{return_data}{OPTIONAL If the scaled matrix and count matrix should be returned.
 if TRUE, a list will be returned with the heatmap and both matricies, if FALSE only
@@ -68,11 +80,6 @@ the heatmap will be returned. Default is FALSE}
 \item{assay}{OPTIONAL what assay should be used for generating the plot}
 
 \item{...}{Other options passed to \code{pheatmap}}
-
-\item{cluster_columns}{OPTIONAL if columns should be clustered. Default is FALSE}
-
-\item{show_rownames}{OPTIONAL if rownames should be printed. Default is TRUE. I generally
-like to print the rownames unless there are too many to be visually pleasing.}
 }
 \value{
 A pheatmap object with x axis colors based on the meta data column provided

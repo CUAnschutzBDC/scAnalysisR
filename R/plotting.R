@@ -30,7 +30,6 @@
 #' aesthetics. Can be helpful if you don't want samples plotted in order. Default is FALSE.
 #' @param ... OPTIONAL arguments supplied to plotDimRedSingle
 #' @return a list of plots colored by the given parameteres
-#' @import tidyverse
 #' @import RColorBrewer
 #' @import viridis
 #' @export
@@ -74,7 +73,7 @@ plotDimRed <- function(sample_object, col_by, save_plot = NULL,
 #' object (ex. UMAP or PCA). You can color the plot using any gene, adt (if they
 #' exist) or meta data column. You can also highlight just one group from an
 #' existing meta data column.
-#' @param sample_object A seurat object
+#' @param seurat_object A seurat object
 #' @param col_by What to color the plot by. May be a gene, adt, or column
 #' from the metadata. It can either be discrete or continuous.
 #' @param plot_type OPTIONAL The type of plot. The possible plots can be found in
@@ -89,7 +88,7 @@ plotDimRed <- function(sample_object, col_by, save_plot = NULL,
 #' only highlight one cluster, meta_data_col = "cluster".
 #' @param group OPTIONAL The group to color. This group must be present in the selected 
 #' meta data column.
-#' @param assasy OPTIONAL The assay to use to color the plot. This is mostly useful if
+#' @param assay OPTIONAL The assay to use to color the plot. This is mostly useful if
 #' you have the same names in your ADT and RNA slots so you can ensure you plot the
 #' correct one.
 #' @param reorder_cells OPTIONAL If cells should be randomly reodered to improve plotting 
@@ -97,7 +96,6 @@ plotDimRed <- function(sample_object, col_by, save_plot = NULL,
 #' @param ... OPTIONAL arguments supplied to groupDiscretePlots, groupContinuousPlots,
 #' discretePlots, or continuousPlots
 #' @keywords internal
-#' @import tidyverse
 #' @import RColorBrewer
 #' @import viridis
 #' @export
@@ -225,7 +223,7 @@ plotDimRedSingle <- function(seurat_object, col_by, plot_type = "umap",
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
 #' @keywords internal
-#' @import tidyverse
+#' @import ggplot2
 #' @import RColorBrewer
 #' @export
 
@@ -233,6 +231,9 @@ discretePlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
                           color = NULL,show_legend = TRUE,
                           size = 0.25, ggrastr = FALSE,
                           raster_scale = 1, raster_res = 300){
+
+  # Work around for "no visible binding"
+  dim1 <- dim2 <- colour_metric <- NULL
   base_plot <- ggplot2::ggplot(data = plot_df,
                                ggplot2::aes(dim1, dim2)) +
     ggplot2::xlab(axis_names[1]) +
@@ -240,10 +241,7 @@ discretePlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
   
   # Add colors based on metric chosen
   if (ggrastr){
-    if (!requireNamespace("ggrastr", quietly = TRUE)){
-      stop("Package \"ggrastr\" needed to make rasterized images. Please install it.",
-           call. = FALSE)
-    }
+    check_packages("ggrastr")
     base_plot <- base_plot +
       ggrastr::geom_point_rast(ggplot2::aes(colour = colour_metric),
                                show.legend = show_legend, size = size,
@@ -292,7 +290,7 @@ discretePlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
 #' @keywords internal
-#' @import tidyverse
+#' @import ggplot2
 #' @import viridis
 #' @export
 
@@ -300,15 +298,15 @@ continuousPlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
                             color = NULL, show_legend = TRUE,
                             size = 0.25, ggrastr = FALSE,
                             raster_scale = 1, raster_res = 300){
+  # Work around for "no visible binding"
+  dim1 <- dim2 <- colour_metric <- labs <- NULL
+
   base_plot <- ggplot2::ggplot(data = plot_df, ggplot2::aes(dim1, dim2)) +
     ggplot2::xlab(axis_names[1]) +
     ggplot2::ylab(axis_names[2])
   
   if (ggrastr){
-    if (!requireNamespace("ggrastr", quietly = TRUE)){
-      stop("Package \"ggrastr\" needed to make rasterized images. Please install it.",
-           call. = FALSE)
-    }
+    check_packages("ggrastr")
     base_plot <- base_plot +
       ggrastr::geom_point_rast(ggplot2::aes(colour = colour_metric),
                                show.legend = show_legend, size = size,
@@ -355,14 +353,16 @@ continuousPlots <- function(plot_df, col_by, axis_names = c("dim1", "dim2"),
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
 #' @keywords internal
-#' @import tidyverse
+#' @import ggplot2
 #' @import RColorBrewer
 #' @export
 
 groupDiscretePlots <- function(group, plot_df, col_by, axis_names = c("dim1", "dim2"),
                                color = NULL, show_legend = TRUE,
                                size = 0.25, ggrastr = FALSE,
-                               raster_scale = 1, raster_res = 300) {
+                               raster_scale = 1, raster_res = 300) {  
+  # Work around for "no visible binding"
+  dim1 <- dim2 <- colour_metric <- NULL
   plot1 <- plot_df[plot_df$all == "all_samples", ]
   plot2 <- plot_df[plot_df$all != "all_samples", ]
 
@@ -447,7 +447,7 @@ groupDiscretePlots <- function(group, plot_df, col_by, axis_names = c("dim1", "d
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
 #' @keywords internal
-#' @import tidyverse
+#' @import ggplot2
 #' @import viridis
 #' @export
 
@@ -456,6 +456,8 @@ groupContinuousPlots <- function(group, plot_df, col_by, color = NULL,
                                  save_plot = NULL, show_legend = TRUE,
                                  size = 0.25, ggrastr = FALSE,
                                  raster_scale = 1, raster_res = 300) {
+  # Work around for "no visible binding"
+  dim1 <- dim2 <- colour_metric <- labs <- NULL
   plot_name_comb <- paste(group, collapse = "_")
   plot1 <- plot_df[plot_df$all == "all_samples", ]
   plot2 <- plot_df[plot_df$all != "all_samples", ]
@@ -554,12 +556,14 @@ groupContinuousPlots <- function(group, plot_df, col_by, color = NULL,
 #' returned as a list. Default (TRUE) returns a figure.
 #' @param dodge OPTIONAL how to adjust the placement of the violin plot. Default is 1
 #' @param width OPTIONAL how to adjust how wide the violin plots are. Default is 0.9
+#' @param assay OPTIONAL what assay to pull the data from. Default is NULL.
 #' @param ... arguments passed to other functions
 #' @return Either a list of plots (if combine = FALSE) or a gridExtra object with all
 #' plots stacked (if combine = TRUE)
-#' @import tidyverse
+#' @import ggplot2
 #' @import RColorBrewer
-#' @import gridExtra
+#' @importFrom gridExtra arrangeGrob
+#' @importFrom stats setNames
 #' @export
 #' @examples
 #' \dontrun{
@@ -588,6 +592,8 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
                          save_plot = NULL, col_by = NULL,
                          plot_median = TRUE, combine = TRUE,
                          dodge = 1, width = 0.9, assay = NULL, ...){
+  # Work around for "no visible binding"
+  x_value <- y_value <- NULL
   geneset <- setNames(geneset, geneset)
   if (plot_type == "jitter") {
     # Make jitter plots colored by cell cycle stage
@@ -631,7 +637,7 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
     
   }
   if (!(is.null(save_plot))){
-    ggplot2::ggsave(plot_list, plot = base_plot)
+    ggplot2::ggsave(save_plot, plot = plot_list)
   }
   if(combine){
     return(plot_list)
@@ -658,7 +664,7 @@ featDistPlot <- function(seurat_object, geneset, cell_cycle = FALSE,
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
 #' @keywords internal
-#' @import tidyverse
+#' @import ggplot2
 #' @import RColorBrewer
 #' @export
 
@@ -668,6 +674,8 @@ jitterPlot <- function(seurat_object, y_val, x_val,
                        ggrastr = FALSE,
                        raster_scale = 1, 
                        raster_res = 300) {
+  # Work around for "no visible binding"
+  x_value <- y_value <- NULL
   plot_data <- plotDF(seurat_object, y_val, x_val,
                       col_by, assay = assay)
   # Determine the number of different colors needed.
@@ -681,10 +689,7 @@ jitterPlot <- function(seurat_object, y_val, x_val,
     ggplot2::ylab(y_val) + ggplot2::xlab(x_val)
   
   if (ggrastr){
-    if (!requireNamespace("ggrastr", quietly = TRUE)){
-      stop("Package \"ggrastr\" needed to make rasterized images. Please install it.",
-           call. = FALSE)
-    }
+    check_packages("ggrastr")
     plot_base <- plot_base +
       ggrastr::geom_jitter_rast(shape = 16, size = size,
                                 scale = raster_scale, raster.dpi = raster_res)
@@ -701,7 +706,7 @@ jitterPlot <- function(seurat_object, y_val, x_val,
     
   } else {
     plot_base <- plot_base +
-      ggplot2::theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
   }
   
   if (is.null(color)) {
@@ -741,7 +746,7 @@ jitterPlot <- function(seurat_object, y_val, x_val,
 #' @param raster_res OPTIONAL. Can be helpful to change if the rasterized plot
 #' looks fuzzy. Default is 300.
 #' @keywords internal
-#' @import tidyverse
+#' @import ggplot2
 #' @import RColorBrewer
 #' @export
 
@@ -754,7 +759,8 @@ violinPlot <- function(seurat_object, y_val, x_val,
                        ggrastr = FALSE,
                        raster_scale = 1, 
                        raster_res = 300) {
-  
+  # Work around for "no visible binding"
+  x_value <- y_value <- median <- NULL 
   plot_data <- plotDF(seurat_object, y_val, x_val,
                       col_by, assay = assay)
   # Determine the number of different colors needed.
@@ -775,14 +781,11 @@ violinPlot <- function(seurat_object, y_val, x_val,
                      axis.text.x=ggplot2::element_blank())
   } else {
     plot_base <- plot_base +
-      ggplot2::theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
   }
   if (plot_jitter) {
     if (ggrastr){
-      if (!requireNamespace("ggrastr", quietly = TRUE)){
-        stop("Package \"ggrastr\" needed to make rasterized images. Please install it.",
-             call. = FALSE)
-      }
+      check_packages("ggrastr")
       plot_base <- plot_base +
         ggrastr::geom_jitter_rast(shape = 16, size = size, scale = raster_scale,
                                   raster.dpi = raster_res)
@@ -821,7 +824,6 @@ violinPlot <- function(seurat_object, y_val, x_val,
 #' @param x_val What to use to separate along the x-axis
 #' @param col_by OPTIONAL what to use to color the cells (or violins).
 #' @keywords internal
-#' @import tidyverse
 #' @export
 
 plotDF <- function(seurat_object, y_val, x_val,
@@ -916,12 +918,17 @@ plotDF <- function(seurat_object, y_val, x_val,
 #' @param min_val OPTIONAL What value to cap the z-score shown. This makes it so highly
 #' variable genes don't completely controll the color scale. Default is -2.5
 #' @param cluster_rows OPTIONAL if rows should be clustered. Default is FALSE
-#' @param cluster_columns OPTIONAL if columns should be clustered. Default is FALSE
+#' @param cluster_cols OPTIONAL if columns should be clustered. Default is FALSE
 #' @param average_expression OPTIONAL if the average expression of clusters should be 
 #' computed before making the heatmap. This option makes much prettier plots, but
 #' can be a bit buggy, I'm still working on making it work more robustly.
-#' @param show_rownames OPTIONAL if rownames should be printed. Default is TRUE. I generally
+#' @param plot_meta_col OPTIONAL If the `meta_col` should be included in the coloring on the top
+#' of the plot. I generally turn this off if I am plotting many features on the top and
+#' have a custum meta_df. Default is TRUE
+#' @param plot_rownames OPTIONAL if rownames should be printed. Default is TRUE. I generally
 #' like to print the rownames unless there are too many to be visually pleasing.
+#' @param cell_order OPTIONAL a custom order of the cells to plot. Default is NULL
+#' and cells will be plotted in the order of the object or by clustering.
 #' @param return_data OPTIONAL If the scaled matrix and count matrix should be returned.
 #' if TRUE, a list will be returned with the heatmap and both matricies, if FALSE only
 #' the heatmap will be returned. Default is FALSE
@@ -929,7 +936,6 @@ plotDF <- function(seurat_object, y_val, x_val,
 #' @param ... Other options passed to `pheatmap`
 #' @return A pheatmap object with x axis colors based on the meta data column provided
 #' or your own meta_df with color_list.
-#' @import tidyverse
 #' @import RColorBrewer
 #' @import grDevices
 #' @export
@@ -959,9 +965,8 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
   if(average_expression){
     # Find average expression of genes in clusters
     Idents(seurat_object) <- meta_col
-    heatmap_df <- AverageExpression(seurat_object, seurat = FALSE,
-                                    group.by = meta_col, assays = assay)
-    heatmap_df <- heatmap_df[[assay]]
+    heatmap_df <- get_average_expression(seurat_object, seurat = FALSE,
+                                         group.by = meta_col, assay = assay)
     # Test if the colnames look like integers
     character_vals <- 
       suppressWarnings(all(!is.na(as.numeric(as.character(colnames(heatmap_df))))))
@@ -988,7 +993,7 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
     }
   } else {
     # Pull out data and subset to genes of interest
-    heatmap_df <- GetAssayData(seurat_object, slot = "data", assay = assay)
+    heatmap_df <- get_seurat_assay(seurat_object, type = "data", assay = assay)
   }
   heatmap_df <- heatmap_df[rownames(heatmap_df) %in% gene_list, ]
   heatmap_df <- data.frame(heatmap_df)
@@ -1090,7 +1095,8 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
 #' @return Either a stacked barplot based on the count or percent of each meta data group
 #' in your sample (if return_values = FALSE) or a data frame with the count and percent
 #' values of each meta data group in your sample (if return_values = TRUE).
-#' @import tidyverse
+#' @import dplyr
+#' @import ggplot2
 #' @import RColorBrewer
 #' @export
 #' @examples
@@ -1109,6 +1115,8 @@ plot_heatmap <- function(seurat_object, gene_list, meta_col,
 stacked_barplots <- function(seurat_object, meta_col, color = NULL,
                              percent = TRUE, split_by = NULL,
                              return_values = FALSE){
+  # Work around for "no visible binding"
+  Freq <- percents <- NULL
   if(!is.null(split_by)){
     meta_data <- Seurat::FetchData(seurat_object, vars = c(meta_col, split_by)) %>%
       dplyr::rename(meta_col = 1, split_by = 2) %>%
