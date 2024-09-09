@@ -748,6 +748,7 @@ jitterPlot <- function(seurat_object, y_val, x_val,
 #' @keywords internal
 #' @import ggplot2
 #' @import RColorBrewer
+#' @importFrom stats median
 #' @export
 
 violinPlot <- function(seurat_object, y_val, x_val,
@@ -760,7 +761,7 @@ violinPlot <- function(seurat_object, y_val, x_val,
                        raster_scale = 1, 
                        raster_res = 300) {
   # Work around for "no visible binding"
-  x_value <- y_value <- median <- NULL 
+  x_value <- y_value <- NULL 
   plot_data <- plotDF(seurat_object, y_val, x_val,
                       col_by, assay = assay)
   # Determine the number of different colors needed.
@@ -808,7 +809,7 @@ violinPlot <- function(seurat_object, y_val, x_val,
   }
   if(plot_median){
     plot_base <- plot_base +
-      ggplot2::stat_summary(fun = median, geom = "point", size = 2,
+      ggplot2::stat_summary(fun = stats::median, geom = "point", size = 2,
                             position = ggplot2::position_dodge(dodge))
   }
   
