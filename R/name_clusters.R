@@ -123,7 +123,12 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
   
   colname <- paste0(assay, "_", save_name)
   
-  seurat_object[[colname]] <- new_clusters[seurat_object[[clusters]][[1]]]
+  # Workaround because seurat v5 gives the error:
+  # Error: No cell overlap between new meta data and Seurat object
+  # When this is done to the object rather than the metadata.
+  seurat_metadata[[colname]] <- new_clusters[seurat_metadata[[clusters]]]
+  
+  seurat_object[[colname]] <- seurat_metadata[[colname]]
   
   plot1 <- plotDimRed(seurat_object, col_by = colname,
                       plot_type = plot_type)
@@ -169,8 +174,13 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     
     colname <- paste0("ADT_", save_name)
     
-    seurat_object[[colname]] <- new_clusters[seurat_object$ADT_cluster]
+    # Workaround because seurat v5 gives the error:
+    # Error: No cell overlap between new meta data and Seurat object
+    # When this is done to the object rather than the metadata.
+    seurat_metadata[[colname]] <- new_clusters[seurat_metadata[[clusters]]]
     
+    seurat_object[[colname]] <- seurat_metadata[[colname]]
+      
     plot1 <- plotDimRed(seurat_object, col_by = colname,
                         plot_type = plot_type)
     plot2 <- plotDimRed(seurat_object, col_by = colname,
@@ -211,7 +221,12 @@ name_clusters <- function(seurat_object, ref_mat, save_dir,
     
     colname <- paste0("combined_", save_name)
     
-    seurat_object[[colname]] <- new_clusters[seurat_object$combined_cluster]
+    # Workaround because seurat v5 gives the error:
+    # Error: No cell overlap between new meta data and Seurat object
+    # When this is done to the object rather than the metadata.
+    seurat_metadata[[colname]] <- new_clusters[seurat_metadata[[clusters]]]
+    
+    seurat_object[[colname]] <- seurat_metadata[[colname]]
     
     plot1 <- plotDimRed(seurat_object, col_by = colname,
                         plot_type = plot_type)
