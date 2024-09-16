@@ -4,15 +4,30 @@
 \alias{get_average_expression}
 \title{Get average expression}
 \usage{
-get_average_expression(object, cell_type_col = "cell_type", assay = "RNA", ...)
+get_average_expression(
+  object,
+  group.by = "cell_type",
+  assay = "RNA",
+  update_col_names = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{A seurat object}
 
-\item{cell_type_col}{The name of column containing cell type information.
+\item{group.by}{optional The name of column containing cell type information.
 Default is \code{cell_type}.}
 
-\item{assay}{What assay the data should be pulled from}
+\item{assay}{optional What assay the data should be pulled from. Default is \code{RNA}}
+
+\item{update_col_names}{optional if the column names should be returned to the
+names from the cell type column. Seurat seems to substantially change these in
+ways that is hard to replicate in V5. They append a "g" if it starts with a number
+and replace underscores with either periods or dashes (I've seen both with the
+exact same meta data column in separate runs). At the moment, it seems like
+the output columns are either ordered by the levels or the default order in
+R. A warning is printed outlining the new and old names to keep an eye on if this
+is correct.}
 
 \item{...}{arguments passed to either AverageExpression (Seurat v4)
 or PseudobulkExpression (seurat V5)}

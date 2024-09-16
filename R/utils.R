@@ -181,16 +181,25 @@ set_seurat_assay <- function(object,
 #'
 #' Helper function to calculate and label the average expression
 #' @param object A seurat object
-#' @param cell_type_col The name of column containing cell type information.
+#' @param group.by optional The name of column containing cell type information.
 #' Default is `cell_type`.
-#' @param assay What assay the data should be pulled from
+#' @param assay optional What assay the data should be pulled from. Default is `RNA`
+#' @param update_col_names optional if the column names should be returned to the 
+#' names from the cell type column. Seurat seems to substantially change these in
+#' ways that is hard to replicate in V5. They append a "g" if it starts with a number
+#' and replace underscores with either periods or dashes (I've seen both with the
+#' exact same meta data column in separate runs). At the moment, it seems like
+#' the output columns are either ordered by the levels or the default order in
+#' R. A warning is printed outlining the new and old names to keep an eye on if this
+#' is correct.
 #' @param ... arguments passed to either AverageExpression (Seurat v4)
 #' or PseudobulkExpression (seurat V5)
 #' @return A data frame of the average expression of the gene.
 #' @import Seurat
 get_average_expression <- function(object,
-                                   cell_type_col = "cell_type",
+                                   group.by = "cell_type",
                                    assay = "RNA",
+                                   update_col_names = FALSE,
                                    ...) {
   # Check seurat version to determine expression function
   if (is_seurat_v5()) {
@@ -198,12 +207,35 @@ get_average_expression <- function(object,
       suppressMessages(PseudobulkExpression(object,
         assay = assay,
         method = "average",
+        group.by = group.by,
         ...
-      ))
+      )[[assay]])
     )
+    if (update_col_names) {
+      # Get the column names to make sure renaming is correct
+      check_names <- colnames(avg_expr_df)
+
+      if (is.null(levels(object[[group_by]][[1]]))){
+        # If there aren't levels, it's ordered by the default ordering
+        replace_names <- unique(object[[group_by]][[1]])
+        replace_names <- replace_names[order(replace_names)]
+      } else {
+        # If there are levels, it's ordered by levels
+        replace_names <- levels(object[[group_by]][[1]])
+      }
+
+      # Finish the warning message
+      names(check_names) <- replace_names
+      print_names <- paste(names(check_names), check_names,
+                           sep = ":", collapse = ", ")
+
+      warning("Updating column names, make sure this mapping is correct: ",
+              print_names)
+      colnames(avg_expr_df) <- replace_names
+    }
   } else {
     avg_expr_df <- data.frame(
-      suppressMessages(AverageExpression(object, ...)[[assay]])
+      suppressMessages(AverageExpression(object, group.by = group.by, ...)[[assay]])
     )
   }
 
