@@ -12,7 +12,8 @@ create_seurat_object(
   min_features = 200,
   min_cells = 3,
   hashtag_idents = NULL,
-  tenx_structure = "multi"
+  tenx_structure = "multi",
+  main_sample = NULL
 )
 }
 \arguments{
@@ -36,9 +37,14 @@ passed to CreateseuratObject. Default is 3.}
 exactly the identity that would be in the rowname. Default is to search for the
 word "Hashtag" in the identity.}
 
-\item{tenx_structure}{OPTIONAL if the file structure is from 10x multi (sample/outs/count),
-10x count (sample/outs/) 10x multi 7 (sample/outs/per_sample_outs/sample/count) or neither
-(sample). Options are "multi" (default), "count", "multi7", or "none"}
+\item{tenx_structure}{OPTIONAL if the file structure is from 10x multi, \code{multi},
+(sample/outs/count), 10x count, \code{count} (sample/outs/), 10x multi 7, \code{multi7}
+(sample/outs/per_sample_outs/sample/count), on chip multiplexing, \code{multiplex},
+(main_sample/outs/per_sample_outs/sample/count), or neither (sample).
+Options are \code{multi} (default), \code{count}, \code{multi7}, \code{multiplex} or \code{none}. If
+\code{multiplex} is set, \code{main_sample} must also be set}
+
+\item{main_sample}{OPTIONAL The name of the main sample if on chip multiplexing was used}
 }
 \value{
 A seurat object with assays for HTO and ADT (if HTO and ADT are true).

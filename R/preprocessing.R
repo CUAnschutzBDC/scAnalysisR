@@ -18,9 +18,13 @@
 #' @param hashtag_idents OPTIONAL the identities of the hashtags. If provided must be
 #' exactly the identity that would be in the rowname. Default is to search for the 
 #' word "Hashtag" in the identity.
-#' @param tenx_structure OPTIONAL if the file structure is from 10x multi (sample/outs/count),
-#' 10x count (sample/outs/) 10x multi 7 (sample/outs/per_sample_outs/sample/count) or neither
-#' (sample). Options are "multi" (default), "count", "multi7", or "none"
+#' @param tenx_structure OPTIONAL if the file structure is from 10x multi, `multi`,
+#' (sample/outs/count), 10x count, `count` (sample/outs/), 10x multi 7, `multi7`
+#' (sample/outs/per_sample_outs/sample/count), on chip multiplexing, `multiplex`,
+#' (main_sample/outs/per_sample_outs/sample/count), or neither (sample). 
+#' Options are `multi` (default), `count`, `multi7`, `multiplex` or `none`. If 
+#' `multiplex` is set, `main_sample` must also be set
+#' @param main_sample OPTIONAL The name of the main sample if on chip multiplexing was used
 #' @return A seurat object with assays for HTO and ADT (if HTO and ADT are true). 
 #' If HTO and ADTs are included, those matricies will be normalized by CLR normalization
 #' @import Seurat
@@ -37,15 +41,27 @@
 
 create_seurat_object <- function(sample, count_path, ADT = TRUE, hashtag = TRUE,
                                  min_features = 200, min_cells = 3,
-                                 hashtag_idents = NULL, tenx_structure = "multi"){
+                                 hashtag_idents = NULL, tenx_structure = "multi",
+                                 main_sample = NULL){
+  if (tenx_structure == "multiplex"){
+    if (is.null(main_sample)){
+      stop(paste0("If chosing `multiplex` for the `tenx_structure` a `main_sample` must",
+                  "\nalso be provided. This is the name of the directory output by",
+                  "\ncellranger."))
+    }
+  }
   if (tenx_structure == "multi"){
     sample_path <- file.path(count_path, sample,
                              "outs", "count", "filtered_feature_bc_matrix")
   } else if (tenx_structure == "count"){
     sample_path <- file.path(count_path, sample,
                              "outs", "filtered_feature_bc_matrix")
-  }else if (tenx_structure == "multi7"){
+  } else if (tenx_structure == "multi7"){
     sample_path <- file.path(count_path, sample, "outs",
+                             "per_sample_outs", sample, "count",
+                             "sample_filtered_feature_bc_matrix")
+  } else if (tenx_structure == "multiplex"){
+    sample_path <- file.path(count_path, main_sample, "outs",
                              "per_sample_outs", sample, "count",
                              "sample_filtered_feature_bc_matrix")
   } else if (tenx_structure == "none"){
